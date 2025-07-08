@@ -1,0 +1,325 @@
+<apex:page standardController="Account" extensions="AccountPortfolioPDF" renderAs="pdf" applyBodyTag="false" applyHtmlTag="false" showHeader="false">
+    <head>
+        <style type="text/css">
+            @page {
+                size: a4;
+                margin: 0.75in;
+                @top-center {
+                    content: element(header);
+                }
+                @bottom-center {
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+            }
+            
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 9pt;
+            }
+            
+            .header {
+                position: running(header);
+                text-align: center;
+            }
+            
+            .pageBreak {
+                page-break-after: always;
+            }
+            
+            .sectionHeader {
+                background-color: #f2f2f2;
+                padding: 8px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+                font-weight: bold;
+                border-bottom: 1px solid #cccccc;
+            }
+            
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            th, td {
+                padding: 8px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+            
+            .subTable {
+                margin-left: 20px;
+                margin-bottom: 15px;
+                width: 95%;
+                background-color: #f9f9f9;
+            }
+            
+            .subTableHeader {
+                background-color: #e6e6e6;
+                font-weight: bold;
+                font-style: italic;
+            }
+            
+            .opportunityRow {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <!-- Header - This will appear on every page -->
+        <div class="header">
+            <h1><apex:outputText value="{!Account.Name}" /> Portfolio</h1>
+        </div>
+
+        <!-- Account Information Section -->
+        <div class="sectionHeader">Account Information</div>
+        <table>
+            <tr>
+                <th>Account Name</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.Name}" /></td>
+                <th>Client Code</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Code__c}" /></td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.Type}" /></td>
+                <th>Industry</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.Industry}" /></td>
+            </tr>
+            <tr>
+                <th>Phone</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.Phone}" /></td>
+                <th>Email</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Account_Email__c}" /></td>
+            </tr>
+            <tr>
+                <th>Account Email</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Account_Email__c}" /></td>
+                <th>Code</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Code__c}" /></td>
+            </tr>
+            <tr>
+                <th>Entity Name</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Entity_Name__c}" /></td>
+                <th>Nature of Business</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Nature_Of_Business__c}" /></td>
+            </tr>
+            <tr>
+                <th>User</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.User__r.Name}" /></td>
+                <th>Service Team</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Service_Team__r.Name}" /></td>
+
+            </tr>
+            <tr>
+                <th>Processor</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.Processor__r.Name}" /></td>
+                <th>Branch</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.mm_Branch__c}" /></td>
+            </tr>
+            <tr>
+                <th>Parent Account</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.Parent.Name}" /></td>
+                <th>Ultimate Parent</th>
+                <td style="width: 35%;"><apex:outputText value="{!account.UltimateParentAccount__c}" /></td>
+            </tr>
+            <tr>
+                <th>Billing Address</th>
+                <td colspan="3">
+                    <apex:outputText value="{!account.BillingStreet}" /><br/>
+                    <apex:outputText value="{!account.BillingCity}" />, <apex:outputText value="{!account.BillingState}" /> <apex:outputText value="{!account.BillingPostalCode}" /><br/>
+                    <apex:outputText value="{!account.BillingCountry}" />
+                </td>
+            </tr>
+            </table>
+        
+        <div style="page-break-after: always;"></div>
+        
+        <!-- Opportunities Section with Insurer Comparison -->
+        <div class="sectionHeader">Opportunities and Insurer Comparisons</div>
+        <apex:outputPanel layout="none" rendered="{!opportunities.size > 0}">
+            <apex:repeat value="{!opportunities}" var="opp">
+                <div style="margin-bottom: 20px;">
+                    <table>
+                        <tr class="opportunityRow">
+                            <th>Opportunity Name</th>
+                            <th>Stage</th>
+                            <th>Amount</th>
+                            <th>Close Date</th>
+                        </tr>
+                        <tr>
+                            <td><apex:outputText value="{!opp.Name}" /></td>
+                            <td><apex:outputText value="{!opp.StageName}" /></td>
+                            <td><apex:outputText value="{0, number, currency}">
+                                    <apex:param value="{!opp.Amount}" />
+                                </apex:outputText></td>
+                            <td><apex:outputText value="{0,date,MM/dd/yyyy}">
+                                    <apex:param value="{!opp.CloseDate}" />
+                                </apex:outputText></td>
+                        </tr>
+                    </table>
+        
+                        <apex:outputPanel layout="none" rendered="{!hasRelatedInsurerComparisons[opp.Id]}">
+                        <h4 style="margin-top: 10px; margin-bottom: 5px; margin-left: 20px;">Related Insurer Comparisons</h4>
+                        <table class="subTable">
+                            <tr class="subTableHeader">
+                                <th>Insurer</th>
+                                <th>Coverage</th>
+                                <th>Comments/Remarks</th>
+                                <th>Chosen</th>
+                            </tr>
+                            <apex:repeat value="{!insurercomparison}" var="ic">
+                                <apex:outputPanel layout="none" rendered="{!ic.mm_Opportunity__c == opp.Id}">
+                                    <tr>
+                                        <td><apex:outputText value="{!ic.Insurer__r.Name}" /></td>
+                                        <td><apex:outputText value="{!ic.Coverage__c}" /></td>
+                                        <td><apex:outputText value="{!ic.mm_Comments_Remarks__c}" /></td>
+                                        <td><apex:outputText value="{!ic.mm_Chosen__c}" /></td>
+                                    </tr>
+                                </apex:outputPanel>
+                            </apex:repeat>
+                        </table>
+                    </apex:outputPanel>
+                </div>
+            </apex:repeat>
+        </apex:outputPanel>
+        <apex:outputPanel layout="none" rendered="{!opportunities.size == 0}">
+            <p>No opportunities found for this account.</p>
+        </apex:outputPanel>
+        
+        <div style="page-break-after: always;"></div>
+        
+        <!-- Insurance Policies Section -->
+        <div class="sectionHeader">Insurance Policies</div>
+        <apex:outputPanel layout="none" rendered="{!insurancePolicies.size > 0}">
+            <table>
+                <tr>
+                    <th>Policy Name</th>
+                    <th>Policy Type</th>
+                    <th>Status</th>
+                    <th>Premium Amount</th>
+                    <th>Policy Term</th>
+                </tr>
+                <apex:repeat value="{!insurancePolicies}" var="policy">
+                    <tr>
+                        <td><apex:outputText value="{!policy.Name}" /></td>
+                        <td><apex:outputText value="{!policy.mm_Transaction_Policy_Type__c}" /></td>
+                        <td><apex:outputText value="{!policy.Status}" /></td>
+                        <td><apex:outputText value="{0, number, currency}">
+                            <apex:param value="{!policy.Gross_Written_Premium_Roll_up__c}" />
+                        </apex:outputText></td>
+                        <td><apex:outputText value="{0,date,MM/dd/yyyy} - {1,date,MM/dd/yyyy}">
+                            <apex:param value="{!policy.EffectiveDate}" />
+                            <apex:param value="{!policy.ExpirationDate}" />
+                        </apex:outputText></td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+        <apex:outputPanel layout="none" rendered="{!insurancePolicies.size == 0}">
+            <p>No insurance policies found for this account.</p>
+        </apex:outputPanel>
+        
+        <div style="page-break-after: always;"></div>
+        
+        <!-- Cases Section -->
+        <apex:outputPanel layout="none" rendered="{!cases.size > 0}">
+            <div class="pageBreak"></div>
+            <div class="sectionHeader">Cases</div>
+            <table>
+                <tr>
+                    <th>Case Number</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Created Date</th>
+                </tr>
+                <apex:repeat value="{!cases}" var="case">
+                    <tr>
+                        <td><apex:outputText value="{!case.CaseNumber}" /></td>
+                        <td><apex:outputText value="{!case.Subject}" /></td>
+                        <td><apex:outputText value="{!case.Status}" /></td>
+                        <td><apex:outputText value="{!case.Priority}" /></td>
+                        <td>
+                            <apex:outputText value="{0, date, MM/dd/yyyy}">
+                                <apex:param value="{!case.CreatedDate}" />
+                            </apex:outputText>
+                        </td>
+                    </tr>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+
+        <div style="page-break-after: always;"></div>
+
+        <!-- Claims Section -->
+        <div class="sectionHeader">Claims and Tasks</div> 
+        <apex:repeat value="{!claims}" var="claim">
+        <tr>
+            <th>Claim Number</th>
+            <th>Policy</th>
+            <th>Status</th>
+            <th>Estimated Amount</th>
+            <th>Actual Amount</th>
+            <th>Loss Date</th>
+        </tr>
+        <tr>
+        <td><apex:outputText value="{!claim.Underwriter_Claim_Number__c}" /></td>
+        <td><apex:outputText value="{!claim.Policy__c}" /></td>
+        <td><apex:outputText value="{!claim.Status}" /></td>
+        <td>
+            <apex:outputText value="{0, number, currency}" rendered="{!claim.EstimatedAmount != null}">
+                <apex:param value="{!claim.EstimatedAmount}" />
+            </apex:outputText>
+        </td>
+        <td>
+            <apex:outputText value="{0, number, currency}" rendered="{!claim.ActualAmount != null}">
+                <apex:param value="{!claim.ActualAmount}" />
+            </apex:outputText>
+        </td>
+        <td>
+            <apex:outputText value="{0, date, MM/dd/yyyy}" rendered="{!claim.LossDate != null}">
+                <apex:param value="{!claim.LossDate}" />
+            </apex:outputText>
+        </td>
+    </tr>
+
+        <!-- Display related tasks for this claim only if there are any -->
+        <apex:outputPanel layout="none" rendered="{!hasRelatedTasks[claim.Id]}">
+        <tr>
+            <td colspan="6" style="padding: 0;">
+                <div style="margin-left: 20px; margin-bottom: 10px; border-left: 3px solid #cccccc; padding-left: 10px;">
+                    <h4>Related Tasks</h4>
+                    <table style="width: 95%;">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Priority</th>
+                            <th>Due Date</th>
+                        </tr>
+                        <apex:repeat value="{!tasks}" var="task">
+                            <apex:outputPanel layout="none" rendered="{!task.WhatId == claim.Id}">
+                                <tr>
+                                    <td><apex:outputText value="{!task.Subject}" /></td>
+                                    <td><apex:outputText value="{!task.Priority}" /></td>
+                                    <td>
+                                        <apex:outputText value="{0, date, MM/dd/yyyy}" rendered="{!task.ActivityDate != null}">
+                                            <apex:param value="{!task.ActivityDate}" />
+                                        </apex:outputText>
+                                    </td>
+                                </tr>
+                            </apex:outputPanel>
+                        </apex:repeat>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        </apex:outputPanel>
+        </apex:repeat>
+    </body>
+</apex:page>
