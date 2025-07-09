@@ -7,6 +7,7 @@
 *
 * Author            Date            Description
 * ==============================================================================================================================================================
+*	Aakash Jain		08-July-2025	Added settimeout and added error log fields
 */ 
 
 public class FetchPolicyTransCoParticipantFromInsight {
@@ -35,15 +36,15 @@ public class FetchPolicyTransCoParticipantFromInsight {
         req.setHeader('INSIGHT-USERNAME', insurexCS[0].insightUsername__c);
         req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
         req.setHeader('Content-Type', 'application/json');
-        
+        req.setTimeout(60000);
         req.setBody(PolicyTransCoParticipantJsonBuilder.buildRequestBody(polId));
         
         Http http = new Http();
         try {
             HttpResponse res = http.send(req);
             System.debug('Response: ' + res.getBody());
+            String jsonResponse = res.getBody();
             if(res.getStatusCode() == 200){
-                String jsonResponse = res.getBody();
                 
                 PolicyTransactionParticipantWrapper parsedData = (PolicyTransactionParticipantWrapper)JSON.deserialize(jsonResponse, PolicyTransactionParticipantWrapper.class);
                 //ParentId = policytranscation
@@ -119,14 +120,17 @@ public class FetchPolicyTransCoParticipantFromInsight {
                 system.debug('PolicyParticipantListToUpsert->'+PolicyParticipantListToUpsert);
             }else{
                 // Handle API error responses
+                
                 mm_Integration_Log__c log = new mm_Integration_Log__c();
                 log.Status_Code__c = String.valueOf(res.getStatusCode());
-                log.mm_Error_Description__c = res.getStatus();
-                log.mm_Payload__c = res.getBody();
+                log.mm_Error_Description__c = jsonResponse;
+                log.Request_Endpoint__c = endpointPath;
+                log.mm_Payload__c =  'requestBody->'+PolicyTransCoParticipantJsonBuilder.buildRequestBody(polId);
+                log.mm_Log_Time__c = system.now();
+                log.mm_Failing_Component__c = 'FetchPolicyTransCoParticipantFromInsight <-> getPolicyTransactionParticipantDatafromInsight';
                 insert log;
             }
             if(!PolicyParticipantListToUpsert.isEmpty()){
-                try{
                     Database.UpsertResult[] results  =  Database.upsert(PolicyParticipantListToUpsert, false);
                     system.debug('PolicyParticipantListToUpsert'+PolicyParticipantListToUpsert);
                     for (Integer i = 0; i < results.size(); i++) {
@@ -137,24 +141,28 @@ public class FetchPolicyTransCoParticipantFromInsight {
                                 if(PolicyParticipantListToUpsert[i].Id != null)
                                     log.Insurance_Policy_Participant__c     = PolicyParticipantListToUpsert[i].Id;
                                 log.Status_Code__c   = string.valueOf(err.getStatusCode());
-                                log.mm_Error_Description__c = err.getMessage();
-                                log.mm_Payload__c	 = String.join(err.getFields(),',');                            
+                                log.mm_Error_Description__c = jsonResponse;
+                                log.Request_Endpoint__c = endpointPath;
+                                log.mm_Payload__c =  'requestBody->'+PolicyTransCoParticipantJsonBuilder.buildRequestBody(polId);                               
+                                log.mm_Log_Time__c = system.now();
+                                log.mm_Failing_Component__c = 'FetchPolicyTransCoParticipantFromInsight <-> getPolicyTransactionParticipantDatafromInsight';
+                                log.mm_Message__c = 'ErrorStatusCode  ->'+err.getStatusCode()+'\n\n ErrorMessage  ->'+err.getMessage()+'\n\n Error Fields ->'+err.getFields();
                                 errorLogs.add(log);
                             }
                         }
                     }
                     insert errorLogs;
-                }            
-                catch (Exception ex) {
-                    System.debug('Callout Error: ' + ex.getMessage());
-                    mm_Integration_Log__c log = new mm_Integration_Log__c();
-                    log.Status_Code__c = String.valueOf(ex.getLineNumber());
-                    log.mm_Error_Description__c = ex.getMessage();
-                    insert log;
-                } 
+               
             }
         }catch (Exception ex) {
             System.debug('Callout Error: ' + ex.getMessage());
+            mm_Integration_Log__c log = new mm_Integration_Log__c();
+            log.Request_Endpoint__c = endpointPath;
+            log.mm_Payload__c =  'requestBody->'+PolicyTransCoParticipantJsonBuilder.buildRequestBody(polId);
+            log.mm_Log_Time__c = system.now();
+            log.mm_Failing_Component__c = 'FetchPolicyTransCoParticipantFromInsight <-> getPolicyTransactionParticipantDatafromInsight';
+            log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
+            insert log;
         }
     }
 }

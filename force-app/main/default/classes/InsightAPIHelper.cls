@@ -6,6 +6,8 @@
 * Change log
 *
 * Author            Date            Description
+* Aakash Jain 		8-July-2025		added settimeout for request and error log fields
+* Aakash Jain		9-July-2025		handled branch and client permission group
 * ==============================================================================================================================================================
  
 ****************************************************/
@@ -90,7 +92,8 @@ public class InsightAPIHelper {
                         log.Account__c = acc.Id;
                         log.Status_Code__c = String.valueOf(res.getStatusCode());
                         log.mm_Error_Description__c = jsonResponse;
-                        log.mm_Payload__c = 'endpointPath ->'+endpointPath+'\n\n requestBody->'+requestBody;
+                        log.Request_Endpoint__c = endpointPath;
+                        log.mm_Payload__c =  'requestBody->'+requestBody;
                         log.mm_Log_Time__c = system.now();
                         log.mm_Failing_Component__c = 'InsightAPIHelper <-> sendClientDetails';
                         log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
@@ -281,18 +284,15 @@ public class InsightAPIHelper {
          }
          client.put('StateId', stateId);
          
-         if(accountList[0].mm_Branch__c  != null && InsightMetadataHelper.getMappedId('Account', 'Branch', accountList[0].mm_Branch__c  ) != null){
-             BranchId = InsightMetadataHelper.getMappedId('Account', 'Branch', accountList[0].mm_Branch__c  );
+         if(accountList[0].mm_Branch__c  != null ){
+             BranchId = integer.valueOf(accountList[0].mm_Branch__c);
          }else{
              BranchId = InsightMetadataHelper.getMappedId('Account', 'Branch', 'Default' );
          }
          client.put('BranchId', BranchId);
          
-         if(accountList[0].mm_Client_Permissions_Groups__c  != null && InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', accountList[0].mm_Client_Permissions_Groups__c  ) != null){
-             RecordPermissionsGroupId = InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', accountList[0].mm_Client_Permissions_Groups__c  );
-             if(RecordPermissionsGroupId != 173){
-                 RecordPermissionsGroupId = InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', 'Default');
-             }
+         if(accountList[0].mm_Client_Permissions_Groups__c  != null ){
+             RecordPermissionsGroupId = integer.valueOf(accountList[0].mm_Client_Permissions_Groups__c);
          }else{
              RecordPermissionsGroupId = InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', 'Default'  );
          }
@@ -325,8 +325,7 @@ public class InsightAPIHelper {
          client.put('AuthorisedRep1Id', 142);    
          client.put('Category1Id', 3);    
          
-         
-        parsedResponse.put('Client', client);
+         parsedResponse.put('Client', client);
         String modifiedJson = JSON.serialize(parsedResponse);
         
         req.setBody(modifiedJson);

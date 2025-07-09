@@ -6,6 +6,7 @@
 * Change log
 *
 * Author            Date            Description
+* Aakash Jain		9-July-2025		handled branch and client permission group
 * ==============================================================================================================================================================
  
 ****************************************************/
@@ -86,7 +87,6 @@ public class ClientJsonBuilder {
         integer AuthorisedRep1Id;
         integer Category1Id;
 
-        /*
         if(acc.BillingCountry != null && InsightMetadataHelper.getMappedId('Account', 'Country', acc.BillingCountry ) != null){
              CountryId = InsightMetadataHelper.getMappedId('Account', 'Country', acc.BillingCountry);
          }else{
@@ -101,18 +101,15 @@ public class ClientJsonBuilder {
          }
          client.put('StateId', stateId);
         
-         if(acc.mm_Branch__c  != null && InsightMetadataHelper.getMappedId('Account', 'Branch', acc.mm_Branch__c  ) != null){
-             BranchId = InsightMetadataHelper.getMappedId('Account', 'Branch', acc.mm_Branch__c  );
+         if(acc.mm_Branch__c  != null ){
+             BranchId = integer.valueOf(acc.mm_Branch__c);
          }else{
              BranchId = InsightMetadataHelper.getMappedId('Account', 'Branch', 'Default' );
          }
          client.put('BranchId', BranchId);
         
-        if(acc.mm_Client_Permissions_Groups__c  != null && InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', acc.mm_Client_Permissions_Groups__c  ) != null){
-             RecordPermissionsGroupId = InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', acc.mm_Client_Permissions_Groups__c  );
-            if(RecordPermissionsGroupId != 173){
-                RecordPermissionsGroupId = InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', 'Default');
-            }
+        if(acc.mm_Client_Permissions_Groups__c  != null ){
+             RecordPermissionsGroupId = integer.valueOf(acc.mm_Client_Permissions_Groups__c);
         }else{
              RecordPermissionsGroupId = InsightMetadataHelper.getMappedId('Account', 'Client Permissions Group', 'Default');
          }
@@ -146,8 +143,10 @@ public class ClientJsonBuilder {
         
         Category1Id = InsightMetadataHelper.getMappedId('Account','Category1Id','Default');
         client.put('Category1Id', Category1Id);    
-        */
+       
         
+        // hardcoded values for CBN testing
+
         client.put('CountryId', 14);
         client.put('StateId', 7);
         client.put('BranchId', 4);
@@ -160,6 +159,7 @@ public class ClientJsonBuilder {
         client.put('AuthorisedRep1Id', 142);    
         client.put('Category1Id', 3);    
 
+        
         Map<String, Object> wrapper = new Map<String, Object>{
             'Client' => client
                 };

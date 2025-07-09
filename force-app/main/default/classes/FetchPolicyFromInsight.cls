@@ -10,6 +10,7 @@
 	Aakash Jain 	8-July-2025		Added null check for record.PolicyNumber in created and updated method also Added integration logs fields for detailed errors
 */
 
+
 public class FetchPolicyFromInsight {
     public static void getCreatedPolicyDatafromInsight(){
         //custom setting

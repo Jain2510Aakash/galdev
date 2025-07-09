@@ -142,5 +142,8 @@ public class FetchPolicyTransFromInsightTest {
         
         System.assert(true, 'Queueable job for updated policy transactions should execute');
     }
-    
+    @isTest(seeAllData = true)
+    static void testgetPolicyTeamIdSF() {        
+        FetchPolicyTransactionFromInsight.getPolicyTeamIdSF(123);
+    }
 }

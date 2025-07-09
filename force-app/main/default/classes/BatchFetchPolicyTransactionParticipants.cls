@@ -28,8 +28,14 @@ global class BatchFetchPolicyTransactionParticipants implements Database.Batchab
                     if(policyTransInsightId != 0)
                         System.enqueueJob(new FetchPolicyTransPrtpntInsightQue(policyTransInsightId));
 
-                } catch (Exception e) {
-                    System.debug('Error converting Id to Integer: ' + e.getMessage());
+                } catch (Exception ex) {
+                    System.debug('Error converting Id to Integer: ' + ex.getMessage());
+                    mm_Integration_Log__c log = new mm_Integration_Log__c();
+                    log.mm_Error_Description__c = ex.getMessage();
+                    log.mm_Log_Time__c = system.now();
+                    log.mm_Failing_Component__c = 'BatchFetchPolicyTransactionParticipants';
+                    log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
+                    insert log;
                     continue;
                 }
             }

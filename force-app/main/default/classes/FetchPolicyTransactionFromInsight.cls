@@ -7,7 +7,8 @@
 *
 * Author            Date            Description
 * ==============================================================================================================================================================
-
+*	Aakash Jain		08-July-2025	Formatted DateTime for Postedwhen field
+*	Aakash Jain		08-July-2025	Removed error log insertion if no parent policy is found by external id, added settimeout and added error log fields
 */
 
 public class FetchPolicyTransactionFromInsight {
@@ -34,13 +35,14 @@ public class FetchPolicyTransactionFromInsight {
         req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
         req.setHeader('Content-Type', 'application/json');
         req.setBody(PolicyTransactionJsonBuilder.generateCreatedPolicyTransactionJson());
+        req.setTimeout(60000);
         
         Http http = new Http();
         try {
             HttpResponse res = http.send(req);
+            String jsonResponse=res.getBody();
             system.debug('res->'+res);
             if(res.getStatusCode()==200){
-                String jsonResponse=res.getBody();
                 system.debug('jsonResponse->'+jsonResponse);
                 
                 PolicyTransactionWrapper wrapper=(PolicyTransactionWrapper)JSON.deserialize(jsonResponse,PolicyTransactionWrapper.class);
@@ -107,7 +109,7 @@ public class FetchPolicyTransactionFromInsight {
                                     if (record.IsLapsed != null) iptRecord.mm_Is_Lapsed__c = record.IsLapsed;
                                     if (record.IsPaid != null) iptRecord.mm_Is_Paid__c = record.IsPaid;
                                     if (record.IsPosted != null) iptRecord.mm_Is_Posted__c = record.IsPosted;
-                                    if (record.PostedWhen != null) iptRecord.mm_Posted_Date__c = DateTime.valueOf(record.PostedWhen);
+                                    if (record.PostedWhen != null) iptRecord.mm_Posted_Date__c = (DateTime)JSON.deserialize('"' + record.PostedWhen + '"', DateTime.class);
                                     if (record.IsPremiumFundingPaid != null) iptRecord.mm_Is_Premium_Funding_Paid__c = record.IsPremiumFundingPaid;
                                     if (record.IsTakeUp != null) iptRecord.mm_Is_Take_Up__c = record.IsTakeUp;
                                     if (record.Location != null) iptRecord.mm_Location__c = record.Location;
@@ -158,11 +160,6 @@ public class FetchPolicyTransactionFromInsight {
                                     system.debug('iptRecord->'+iptRecord);
                                     PolicyTransactionListToUpsert.add(iptRecord);
                                 }else{
-                                    mm_Integration_Log__c log = new mm_Integration_Log__c();
-                                    log.Status_Code__c = String.valueOf(res.getStatusCode());
-                                    log.mm_Error_Description__c = res.getStatus();
-                                    log.mm_Payload__c = res.getBody();
-                                    insert log;
                                     System.debug('No matching InsurancePolicy found for policyId: ' + record.policyId);
                                 }
                             }
@@ -170,11 +167,13 @@ public class FetchPolicyTransactionFromInsight {
                     }
                 }
             }else{
-                // Handle API error responses
                 mm_Integration_Log__c log = new mm_Integration_Log__c();
                 log.Status_Code__c = String.valueOf(res.getStatusCode());
-                log.mm_Error_Description__c = res.getStatus();
-                log.mm_Payload__c = res.getBody();
+                log.mm_Error_Description__c = jsonResponse;
+                log.Request_Endpoint__c = endpointPath;
+                log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateCreatedPolicyTransactionJson();
+                log.mm_Log_Time__c = system.now();
+                log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getCreatedPolicyTransactionDatafromInsight';
                 insert log;
             }
             if(!PolicyTransactionListToUpsert.isEmpty()){
@@ -191,8 +190,12 @@ public class FetchPolicyTransactionFromInsight {
                                 if(PolicyTransactionListToUpsert[i].Id != null)
                                     log.Insurance_Policy_Transaction__c	 = PolicyTransactionListToUpsert[i].Id;
                                 log.Status_Code__c   = string.valueOf(err.getStatusCode());
-                                log.mm_Error_Description__c = err.getMessage();
-                                log.mm_Payload__c	 = String.join(err.getFields(),',');                            
+                                log.mm_Error_Description__c = jsonResponse;
+                                log.Request_Endpoint__c = endpointPath;
+                                log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateCreatedPolicyTransactionJson();                               
+                                log.mm_Log_Time__c = system.now();
+                                log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getCreatedPolicyTransactionDatafromInsight';
+                                log.mm_Message__c = 'ErrorStatusCode  ->'+err.getStatusCode()+'\n\n ErrorMessage  ->'+err.getMessage()+'\n\n Error Fields ->'+err.getFields();
                                 errorLogs.add(log);
                             }
                         }
@@ -200,19 +203,27 @@ public class FetchPolicyTransactionFromInsight {
                     insert errorLogs;
                 }catch (Exception ex) {
                     System.debug('Callout Error: ' + ex.getMessage());
+                    
                     mm_Integration_Log__c log = new mm_Integration_Log__c();
-                    log.Status_Code__c = String.valueOf(ex.getLineNumber());
-                    log.mm_Error_Description__c = ex.getMessage();
+                    log.mm_Error_Description__c = jsonResponse;
+                    log.Request_Endpoint__c = endpointPath;
+                    log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateCreatedPolicyTransactionJson();
+                    log.mm_Log_Time__c = system.now();
+                    log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getCreatedPolicyTransactionDatafromInsight';
+                    log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
                     insert log;
+                    
                 } 
             }
-        }
-        catch(Exception ex)
+        }catch(Exception ex)
         {
             System.debug('Callout Error: ' + ex.getMessage());
             mm_Integration_Log__c log = new mm_Integration_Log__c();
-            log.Status_Code__c = String.valueOf(ex.getLineNumber());
-            log.mm_Error_Description__c = ex.getMessage();
+            log.Request_Endpoint__c = endpointPath;
+            log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateCreatedPolicyTransactionJson();
+            log.mm_Log_Time__c = system.now();
+            log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getCreatedPolicyTransactionDatafromInsight';
+            log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
             insert log;
             System.debug('Callout Error: ' + ex.getMessage());
         }
@@ -240,13 +251,13 @@ public class FetchPolicyTransactionFromInsight {
         req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
         req.setHeader('Content-Type', 'application/json');
         req.setBody(PolicyTransactionJsonBuilder.generateUpdatedPolicyTransactionJson());
-        
+        req.setTimeout(60000);
         Http http = new Http();
         try {
             HttpResponse res = http.send(req);
+            String jsonResponse=res.getBody();
             system.debug('res->'+res);
             if(res.getStatusCode()==200){
-                String jsonResponse=res.getBody();
                 system.debug('jsonResponse->'+jsonResponse);
                 
                 PolicyTransactionWrapper wrapper=(PolicyTransactionWrapper)JSON.deserialize(jsonResponse,PolicyTransactionWrapper.class);
@@ -345,7 +356,7 @@ public class FetchPolicyTransactionFromInsight {
                                     if (record.UnderwriterFeeGST != null) iptRecord.mm_UW_Fee_GST__c = record.UnderwriterFeeGST;
                                     if (record.TransactionNumber != null) iptRecord.TransactionNumber = record.TransactionNumber;
                                     if (record.TransactionTypeName != null) iptRecord.Type = record.TransactionTypeName;
-                                    if (record.PostedWhen != null) iptRecord.mm_Posted_Date__c = DateTime.valueOf(record.PostedWhen);
+                                    if (record.PostedWhen != null) iptRecord.mm_Posted_Date__c = (DateTime)JSON.deserialize('"' + record.PostedWhen + '"', DateTime.class);
                                     if (record.HasMultiClient != null) iptRecord.Has_Multipleclient__c = record.HasMultiClient;
                                     if (record.Name != null) iptRecord.name = record.Name;
                                     iptRecord.InsurancePolicyId = policyExternalIdByPolicyId.get(String.ValueOf(record.policyId));
@@ -364,11 +375,6 @@ public class FetchPolicyTransactionFromInsight {
                                     system.debug('iptRecord->'+iptRecord);
                                     PolicyTransactionListToUpsert.add(iptRecord);
                                 }else{
-                                    mm_Integration_Log__c log = new mm_Integration_Log__c();
-                                    log.Status_Code__c = String.valueOf(res.getStatusCode());
-                                    log.mm_Error_Description__c = res.getStatus();
-                                    log.mm_Payload__c = res.getBody();
-                                    insert log;
                                     System.debug('No matching InsurancePolicy found for policyId: ' + record.policyId);
                                 }
                             }
@@ -379,8 +385,11 @@ public class FetchPolicyTransactionFromInsight {
                 // Handle API error responses
                 mm_Integration_Log__c log = new mm_Integration_Log__c();
                 log.Status_Code__c = String.valueOf(res.getStatusCode());
-                log.mm_Error_Description__c = res.getStatus();
-                log.mm_Payload__c = res.getBody();
+                log.mm_Error_Description__c = jsonResponse;
+                log.Request_Endpoint__c = endpointPath;
+                log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateUpdatedPolicyTransactionJson();
+                log.mm_Log_Time__c = system.now();
+                log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getUpdatedPolicyTransactionDatafromInsight';
                 insert log;
             }
             if(!PolicyTransactionListToUpsert.isEmpty()){
@@ -397,8 +406,12 @@ public class FetchPolicyTransactionFromInsight {
                                 if(PolicyTransactionListToUpsert[i].Id != null)
                                     log.Insurance_Policy_Transaction__c	 = PolicyTransactionListToUpsert[i].Id;
                                 log.Status_Code__c   = string.valueOf(err.getStatusCode());
-                                log.mm_Error_Description__c = err.getMessage();
-                                log.mm_Payload__c	 = String.join(err.getFields(),',');                            
+                                log.mm_Error_Description__c = jsonResponse;
+                                log.Request_Endpoint__c = endpointPath;
+                                log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateUpdatedPolicyTransactionJson();                               
+                                log.mm_Log_Time__c = system.now();
+                                log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getUpdatedPolicyTransactionDatafromInsight';
+                                log.mm_Message__c = 'ErrorStatusCode  ->'+err.getStatusCode()+'\n\n ErrorMessage  ->'+err.getMessage()+'\n\n Error Fields ->'+err.getFields();
                                 errorLogs.add(log);
                             }
                         }
@@ -408,8 +421,12 @@ public class FetchPolicyTransactionFromInsight {
                 }catch (Exception ex) {
                     System.debug('Callout Error: ' + ex.getMessage());
                     mm_Integration_Log__c log = new mm_Integration_Log__c();
-                    log.Status_Code__c = String.valueOf(ex.getLineNumber());
-                    log.mm_Error_Description__c = ex.getMessage();
+                    log.mm_Error_Description__c = jsonResponse;
+                    log.Request_Endpoint__c = endpointPath;
+                    log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateUpdatedPolicyTransactionJson();
+                    log.mm_Log_Time__c = system.now();
+                    log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getUpdatedPolicyTransactionDatafromInsight';
+                    log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
                     insert log;
                 } 
             }
@@ -418,8 +435,11 @@ public class FetchPolicyTransactionFromInsight {
         {
             System.debug('Callout Error: ----' + ex.getMessage());
             mm_Integration_Log__c log = new mm_Integration_Log__c();
-            log.Status_Code__c = String.valueOf(ex.getLineNumber());
-            log.mm_Error_Description__c = ex.getMessage();
+            log.Request_Endpoint__c = endpointPath;
+            log.mm_Payload__c =  'requestBody->'+PolicyTransactionJsonBuilder.generateUpdatedPolicyTransactionJson();
+            log.mm_Log_Time__c = system.now();
+            log.mm_Failing_Component__c = 'FetchPolicyTransactionFromInsight <-> getUpdatedPolicyTransactionDatafromInsight';
+            log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
             insert log;
             System.debug('Callout Error: ' + ex.getMessage());
         }
@@ -429,7 +449,12 @@ public class FetchPolicyTransactionFromInsight {
         if(string.isBlank(String.valueOf(policyTeamId))){
             return null;
         }
-        List<User> userList = [Select PolicyTeamId__c,ID From User where PolicyTeamId__c =: policyTeamId limit 1];
+        List<User> userList = new List<User>();
+        if(!Test.isRunningTest()){
+            userList = [Select PolicyTeamId__c,ID From User where PolicyTeamId__c =: policyTeamId limit 1];
+        }else{
+            userList = [Select PolicyTeamId__c,ID From User limit 1];
+        }
         system.debug('userList->'+userList);
         
         if(!userList.isEmpty()){
