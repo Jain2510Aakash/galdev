@@ -6,6 +6,7 @@
 * Change log
 *
 * Author            Date            Description
+* Aakash Jain		11-July-2025	handled null for fetching the triggering contact 
 * ==============================================================================================================================================================
  
 ****************************************************/
@@ -32,16 +33,20 @@ public class ContactFlowHandler {
 
     @future(callout = true)
     public static void handleCreate(string contactId){
-        Contact con = [SELECT Id, Addressee__c ,Birthdate ,Email ,Fax ,mm_Created_When__c ,mm_Created_Who__c ,mm_External_Id__c ,mm_Is_Primary_Contact__c ,MobilePhone ,Name ,OtherPhone ,Phone ,Salutation ,Title,Account.mm_INSIGHTS_Id__c, RowVersion__c from Contact where Id = :contactId AND Account.mm_INSIGHTS_Id__c != null LIMIT 1];
-        system.debug('sendClientDetails->'+'Create Client');
-        InsightAPIHelperContact.sendContactDetails(con,'create', null, null);
+        List<Contact> contactList = [SELECT Id, Addressee__c ,Birthdate ,Email ,Fax ,mm_Created_When__c ,mm_Created_Who__c ,mm_External_Id__c ,mm_Is_Primary_Contact__c ,MobilePhone ,Name ,OtherPhone ,Phone ,Salutation ,Title,Account.mm_INSIGHTS_Id__c, RowVersion__c from Contact where Id = :contactId AND Account.mm_INSIGHTS_Id__c != null LIMIT 1];
+        if(!contactList.isEmpty()){
+            InsightAPIHelperContact.sendContactDetails(contactList[0],'create', null, null);
+        }
     }
-    
+
     @future(callout = true)
     public static void handleUpdate(string contactId){
-        string conInsightId = [SELECT Id,mm_External_Id__c  from Contact where Id = :contactId AND Account.mm_INSIGHTS_Id__c != null LIMIT 1].mm_External_Id__c;
-        if(!string.isBlank(conInsightId)){
-            InsightAPIHelperContact.getContactDetails(conInsightId,contactId);
+        List<Contact> contactList = [SELECT Id,mm_External_Id__c  from Contact where Id = :contactId LIMIT 1];
+        if(!contactList.isEmpty()){
+            string conInsightId = contactList[0].mm_External_Id__c;
+            if(!string.isBlank(conInsightId)){
+                InsightAPIHelperContact.getContactDetails(conInsightId,contactId);
+            }
         }
     }
 }

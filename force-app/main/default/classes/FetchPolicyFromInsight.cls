@@ -14,7 +14,7 @@
 public class FetchPolicyFromInsight {
     public static void getCreatedPolicyDatafromInsight(){
         //custom setting
-        List<insurex__c> insurexCS = insurex__c.getall().values();
+        List<Insight_API_Details__c> insightAPI = Insight_API_Details__c.getall().values();
         String endpointPath = '/Policy/List';
         String httpMethod = 'POST'; 
         Set<String> clientIdsSet = new Set<string>();
@@ -28,9 +28,9 @@ public class FetchPolicyFromInsight {
         
         HttpRequest req = new HttpRequest();
         req.setMethod(httpMethod);
-        req.setEndpoint(insurexCS[0].endpoint__c + endpointPath);
-        req.setHeader('INSIGHT-USERNAME', insurexCS[0].insightUsername__c);
-        req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
+        req.setEndpoint(insightAPI[0].Insight_Endpoint__c + endpointPath);
+        req.setHeader('INSIGHT-USERNAME', insightAPI[0].Insight_Username__c);
+        req.setHeader('INSIGHT-PASSWORD', insightAPI[0].Insight_Password__c);
         req.setHeader('Content-Type', 'application/json');
         req.setTimeout(60000);
         req.setBody(PolicyJsonBuilder.generateCreatedPolicyJson());
@@ -172,7 +172,7 @@ public class FetchPolicyFromInsight {
     }
     public static void getUpdatedPolicyDatafromInsight(){
         //custom setting
-        List<insurex__c> insurexCS = insurex__c.getall().values();
+        List<Insight_API_Details__c> insightAPI = Insight_API_Details__c.getall().values();
         String endpointPath = '/Policy/List';
         String httpMethod = 'POST'; 
         Set<String> clientIdsSet = new Set<string>();
@@ -186,9 +186,9 @@ public class FetchPolicyFromInsight {
         
         HttpRequest req = new HttpRequest();
         req.setMethod(httpMethod);
-        req.setEndpoint(insurexCS[0].endpoint__c + endpointPath);
-        req.setHeader('INSIGHT-USERNAME', insurexCS[0].insightUsername__c);
-        req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
+        req.setEndPoint(insightAPI[0].Insight_Endpoint__c+endpointPath);
+        req.setHeader('INSIGHT-USERNAME', insightAPI[0].Insight_Username__c);
+        req.setHeader('INSIGHT-PASSWORD', insightAPI[0].Insight_Password__c);
         req.setHeader('Content-Type', 'application/json');
         req.setTimeout(60000);
         req.setBody(PolicyJsonBuilder.generateUpdatedPolicyJson());

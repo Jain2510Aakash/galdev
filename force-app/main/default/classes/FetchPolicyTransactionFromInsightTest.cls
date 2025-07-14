@@ -3,16 +3,13 @@ private class FetchPolicyTransactionFromInsightTest {
 
     @testSetup
     static void setupTestData() {
-        // Create and insert test data for insurex__c, InsurancePolicy, and InsurancePolicyTransaction
-        List<insurex__c> insurexList = new List<insurex__c>{
-            new insurex__c(
-                Name = 'Test Insurex',
-                endpoint__c = 'https://mockapi.com',
-                insightUsername__c = 'testuser',
-                insightPassword__c = 'testpassword'
-            )
-        };
-        insert insurexList;
+        // Create and insert test data for Insight_API_Details__c, InsurancePolicy, and InsurancePolicyTransaction
+       	Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
         
         Account testAccount = new Account(
             Name = 'Test Account',

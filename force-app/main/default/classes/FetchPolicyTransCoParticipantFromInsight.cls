@@ -14,7 +14,7 @@ public class FetchPolicyTransCoParticipantFromInsight {
     // polId = Policy transactionId
     public static void getPolicyTransactionParticipantDatafromInsight(integer polId){
         //custom setting
-        List<insurex__c> insurexCS = insurex__c.getall().values();
+        List<Insight_API_Details__c> insightAPI=Insight_API_Details__c.getAll().values();
         String endpointPath = '/MultiClient/List';
         String httpMethod = 'POST'; 
         Set<String> AccountInsightSet = new Set<String>();
@@ -32,10 +32,10 @@ public class FetchPolicyTransCoParticipantFromInsight {
         
         HttpRequest req = new HttpRequest();
         req.setMethod(httpMethod);
-        req.setEndpoint(insurexCS[0].endpoint__c + endpointPath);
-        req.setHeader('INSIGHT-USERNAME', insurexCS[0].insightUsername__c);
-        req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
-        req.setHeader('Content-Type', 'application/json');
+        req.setEndPoint(insightAPI[0].Insight_Endpoint__c+endpointPath);
+        req.setHeader('INSIGHT-USERNAME', insightAPI[0].Insight_Username__c);
+        req.setHeader('INSIGHT-PASSWORD', insightAPI[0].Insight_Password__c);
+        req.setHeader('Content-Type', 'application/json'); 
         req.setTimeout(60000);
         req.setBody(PolicyTransCoParticipantJsonBuilder.buildRequestBody(polId));
         

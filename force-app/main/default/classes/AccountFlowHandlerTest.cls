@@ -15,12 +15,12 @@ public class AccountFlowHandlerTest {
         );
         insert testAccount;
         
-        insurex__c insureRec = new insurex__c();
-		insureRec.endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
-		insureRec.Name='insurex';
-        insureRec.insightUsername__c='testabc';
-        insureRec.insightPassword__c='testcardasf';
-        insert insureRec;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
         
         // Create test requests
         List<AccountFlowHandler.RequestWrapper> requestList = new List<AccountFlowHandler.RequestWrapper>();

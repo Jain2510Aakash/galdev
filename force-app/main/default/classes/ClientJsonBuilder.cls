@@ -7,6 +7,8 @@
 *
 * Author            Date            Description
 * Aakash Jain		9-July-2025		handled branch and client permission group
+* Aakash Jain		11-July-2025	handled Standard industry code
+* Aakash Jain 	 	11-July-2025	handled fax and phone length
 * ==============================================================================================================================================================
  
 ****************************************************/
@@ -61,10 +63,18 @@ public class ClientJsonBuilder {
         if (acc.BillingState != null) client.put('StateName', acc.BillingState);
         if (acc.BillingPostalCode != null) client.put('Postcode', acc.BillingPostalCode.left(4));
         if (acc.BillingCountry != null) client.put('CountryName', acc.BillingCountry);
-        if (acc.Phone != null) client.put('Telephone', acc.Phone);
         if (acc.mm_Phone_Other__c != null) client.put('Telephone2', acc.mm_Phone_Other__c);
         if (acc.mm_Account_Email__c != null) client.put('Email', acc.mm_Account_Email__c);
-        if (acc.Fax != null) client.put('Fax', acc.Fax);
+        String phone = acc.Phone != null ? acc.Phone.trim() : null;
+        if (phone != null) {
+            phone = phone.length() > 15 ? phone.substring(0, 15) : phone;
+            client.put('Telephone', phone);
+        }
+        String Fax = acc.Fax != null ? acc.Fax.trim() : null;
+        if (Fax != null) {
+            Fax = Fax.length() > 15 ? Fax.substring(0, 15) : Fax;
+            client.put('Fax', Fax);
+        }   
         if (acc.PersonMobilePhone != null) client.put('Mobile', acc.PersonMobilePhone);
         if (acc.Website != null) client.put('Web', acc.Website);
         if (acc.mm_Account_Name__c != null) client.put('AccountName', acc.mm_Account_Name__c);
@@ -131,9 +141,13 @@ public class ClientJsonBuilder {
         
         ProfileId = InsightMetadataHelper.getMappedId('Account','ProfileId','Default');
         client.put('ProfileId', ProfileId); 
-        
-        StandardIndustryCode = InsightMetadataHelper.getMappedId('Account','StandardIndustryCode','Default');
-        client.put('StandardIndustryCode', StandardIndustryCode);   
+                
+        if(acc.Industry  != null ){
+            StandardIndustryCode = InsightMetadataHelper.getMappedId('Account', 'StandardIndustryCode', acc.Industry);
+        }else{
+            StandardIndustryCode = InsightMetadataHelper.getMappedId('Account', 'StandardIndustryCode', 'Default');
+        }
+        client.put('StandardIndustryCode', StandardIndustryCode);
         
         ComplianceTypeId = InsightMetadataHelper.getMappedId('Account','ComplianceTypeId','Default');
         client.put('ComplianceTypeId', ComplianceTypeId);    
@@ -147,7 +161,7 @@ public class ClientJsonBuilder {
         
         // hardcoded values for CBN testing
 
-        client.put('CountryId', 14);
+       /* client.put('CountryId', 14);
         client.put('StateId', 7);
         client.put('BranchId', 4);
         client.put('RecordPermissionsGroupId', 4);
@@ -157,7 +171,7 @@ public class ClientJsonBuilder {
         client.put('BranchId', 4);
         client.put('ComplianceTypeId', 1);
         client.put('AuthorisedRep1Id', 142);    
-        client.put('Category1Id', 3);    
+        client.put('Category1Id', 3);   */ 
 
         
         Map<String, Object> wrapper = new Map<String, Object>{

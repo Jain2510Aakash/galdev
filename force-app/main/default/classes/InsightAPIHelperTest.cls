@@ -26,12 +26,13 @@ public class InsightAPIHelperTest {
     @isTest
     static void testSendClientDetails_Create() {
         // Step 1: Create a mock Custom Setting for the callout
-        insurex__c mockSetting = new insurex__c();
-        mockSetting.endpoint__c = 'https://mock-api.com';
-        mockSetting.insightUsername__c = 'mockUser';
-        mockSetting.insightPassword__c = 'mockPass';
-        mocksetting.Name = 'mockName';
-        insert mockSetting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
+
         
         // Step 2: Create a test account for sending the details
         Account testAccount = new Account(
@@ -64,12 +65,13 @@ public class InsightAPIHelperTest {
     @isTest
     static void testSendClientDetails_Update() {
         // Create a mock Custom Setting for the callout
-        insurex__c mockSetting = new insurex__c();
-        mockSetting.endpoint__c = 'https://mock-api.com';
-        mockSetting.insightUsername__c = 'mockUser';
-        mockSetting.insightPassword__c = 'mockPass';
-        mocksetting.Name = 'mockName';
-        insert mockSetting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
+
         
         // Create a test account for sending the details
         Account testAccount = new Account(
@@ -96,12 +98,13 @@ public class InsightAPIHelperTest {
     @isTest
     static void testSendClientDetails_ErrorHandling() {
         // Create a mock Custom Setting for the callout
-        insurex__c mockSetting = new insurex__c();
-        mockSetting.endpoint__c = 'https://mock-api.com';
-        mockSetting.insightUsername__c = 'mockUser';
-        mockSetting.insightPassword__c = 'mockPass';
-        mocksetting.Name = 'mockName';
-        insert mockSetting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
+
         
         // Create a test account for sending the details
         Account testAccount = new Account(
@@ -138,13 +141,13 @@ public class InsightAPIHelperTest {
     @isTest
     static void testGetClientDetails_Success() {
         // Setup custom setting
-        insurex__c setting = new insurex__c(
-            Name = 'mockName',
-            endpoint__c = 'https://mock-api.com',
-            insightUsername__c = 'mockUser',
-            insightPassword__c = 'mockPass'
-        );
-        insert setting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
+
         
         // Insert test account
         Account acc = new Account(Name = 'Client Get Test');
@@ -162,13 +165,13 @@ public class InsightAPIHelperTest {
     @isTest
     static void testUpdateClientDetailsOnInsight_ValidData() {
         // Insert required custom setting
-        insurex__c setting = new insurex__c(
-            Name = 'mockName',
-            endpoint__c = 'https://mock-api.com',
-            insightUsername__c = 'mockUser',
-            insightPassword__c = 'mockPass'
-        );
-        insert setting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
+
         
         // Insert test account
         Account acc = new Account(Name = 'Update Client Insight',mm_INSIGHTS_Id__c = '123');

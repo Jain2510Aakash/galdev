@@ -50,12 +50,12 @@ private class FetchPolicyTransExtdFromInsightTest {
 
     static void createRequiredData(Boolean withInvalidInsightId) {
         // Create required config
-        insert new insurex__c(
-            Name = 'TestConfig',
-            endpoint__c = 'https://fake.insight',
-            insightUsername__c = 'user',
-            insightPassword__c = 'pass'
-        );
+       	Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
 
         Account acc = new Account(Name = 'Test Acc', mm_INSIGHTS_Id__c = '123');
         insert acc;

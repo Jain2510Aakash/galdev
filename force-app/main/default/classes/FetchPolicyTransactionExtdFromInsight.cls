@@ -12,17 +12,17 @@
 public class FetchPolicyTransactionExtdFromInsight {
     
     public static void getPolicyTransactionExtendedDatafromInsight(integer policyTransInsightId,string policyTransId){
-        List<insurex__c> insurexCS=insurex__c.getAll().values();
+        List<Insight_API_Details__c> insightAPI=Insight_API_Details__c.getAll().values();
         String endpointPath = '/PolicyTransaction/GetEx';
         String httpMethod = 'POST'; 
         List<mm_Integration_Log__c> errorLogs = new List<mm_Integration_Log__c>();
         
         HttpRequest req=new HttpRequest();
         req.setMethod(httpMethod);
-        req.setEndPoint(insurexCS[0].endpoint__c+endpointPath);
-        req.setHeader('INSIGHT-USERNAME', insurexCS[0].insightUsername__c);
-        req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
-        req.setHeader('Content-Type', 'application/json');
+        req.setEndPoint(insightAPI[0].Insight_Endpoint__c+endpointPath);
+        req.setHeader('INSIGHT-USERNAME', insightAPI[0].Insight_Username__c);
+        req.setHeader('INSIGHT-PASSWORD', insightAPI[0].Insight_Password__c);
+        req.setHeader('Content-Type', 'application/json'); 
         req.setBody(PolicyTransCoParticipantJsonBuilder.buildRequestBody(policyTransInsightId));
         
         Http http = new Http();

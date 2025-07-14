@@ -38,12 +38,12 @@ public class InsightAPIHelperContactTest {
         insert testContact;
         
         // Create a custom setting to mock
-        insurex__c testSetting = new insurex__c();
-        testSetting.endpoint__c = 'https://mockapi.com';
-        testSetting.insightUsername__c = 'testuser';
-        testSetting.insightPassword__c = 'testpassword';
-        testSetting.Name = 'testName';
-        insert testSetting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
         
         // Set the mock callout response for the HTTP request
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
@@ -75,12 +75,12 @@ public class InsightAPIHelperContactTest {
         insert testContact;
         
         // Create a custom setting to mock
-        insurex__c testSetting = new insurex__c();
-        testSetting.endpoint__c = 'https://mockapi.com';
-        testSetting.insightUsername__c = 'testuser';
-        testSetting.insightPassword__c = 'testpassword';
-        testSetting.Name = 'testName';
-        insert testSetting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
         
         // Set the mock callout response for the HTTP request
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
@@ -124,13 +124,13 @@ public class InsightAPIHelperContactTest {
         testContact.AccountId=acc.Id;
         insert testContact;
         
-        // Create a custom setting to mock
-        insurex__c testSetting = new insurex__c();
-        testSetting.endpoint__c = 'https://mockapi.com';
-        testSetting.insightUsername__c = 'testuser';
-        testSetting.insightPassword__c = 'testpassword';
-        testSetting.Name = 'testName';
-        insert testSetting;
+        // Create a custom setting to mock 
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
         
         // Set the mock callout to simulate an error response (non-200 status code)
         Test.setMock(HttpCalloutMock.class, new MockHttpErrorResponse());
@@ -161,10 +161,47 @@ public class InsightAPIHelperContactTest {
         insert con;
         
         // Insert setting
-        insert new insurex__c(Name = 'test', endpoint__c = 'https://mockapi.com', insightUsername__c = 'user', insightPassword__c = 'pass');
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
         
         // Simulate 500 error
         Test.setMock(HttpCalloutMock.class, new MockHttpErrorResponse());
+        
+        Test.startTest();
+        InsightAPIHelperContact.getContactDetails('123', con.Id);
+        Test.stopTest();
+        
+        List<mm_Integration_Log__c> logs = [SELECT Id, Status_Code__c FROM mm_Integration_Log__c WHERE Contact__c = :con.Id];
+        //System.assertEquals(1, logs.size(), 'Log should be created for failed getContactDetails');
+    }
+    
+      @isTest
+    static void testGetContactDetails_SuccessResponse() {
+        
+        Account acc=new Account();
+        acc.Name='test account 1';
+        acc.mm_INSIGHTS_Id__c='a0123';
+        insert acc;
+        
+        Contact con = new Contact(LastName = 'Error', FirstName = 'Case');
+        con.AccountId=acc.Id;
+        
+        insert con;
+        
+        // Insert setting
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
+        
+        // Simulate 500 error
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         
         Test.startTest();
         InsightAPIHelperContact.getContactDetails('123', con.Id);
@@ -183,12 +220,17 @@ public class InsightAPIHelperContactTest {
         insert con;
         
         // Insert custom setting
-        insert new insurex__c(Name = 'test', endpoint__c = 'https://mockapi.com', insightUsername__c = 'user', insightPassword__c = 'pass');
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
         
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         
         Test.startTest();
-        InsightAPIHelperContact.updateContactDetailsOnInsight('ver123', 12345, con.Id);
+        InsightAPIHelperContact.updateContactDetailsOnInsight('	{     "Contact": {         "Id": 922,         "CreatedWho": "galvaniize.api.test",         "CreatedWhen": "2025-07-11T06:05:00Z",         "RowVersion": "000000000080FBD4",         "ParentId": 1053,         "ParentEntityName": "AccTest04",         "ParentEntityRef": "Nsure - Deckee ",         "IsPrimary": false,         "Addressee": "new chk tst 12345",         "Salutation": "Mr.",         "JobTitle": "",         "Telephone2": "",         "Mobile": "2345",         "Fax": "",         "Email": "new12312112chktst@gmail.com",         "BirthDate": "2025-06-02",         "ContactType": "",         "IsClient": true,         "IsInsurer": false,         "IsAuthorisedRep": false,         "AuditId": 922,         "Name": "new chk tst 12345",         "AuditCategory": "Contact",         "AuditTaskType": "Client"     } }', con.Id);
         Test.stopTest();
         
         // Confirm no error log created
@@ -199,7 +241,7 @@ public class InsightAPIHelperContactTest {
     @isTest
     static void testUpdateContactDetailsOnInsight_InvalidInput() {
         Test.startTest();
-        InsightAPIHelperContact.updateContactDetailsOnInsight(null, null, null);
+        InsightAPIHelperContact.updateContactDetailsOnInsight(null, null);
         Test.stopTest();
         
         List<mm_Integration_Log__c> logs = [SELECT Id FROM mm_Integration_Log__c ORDER BY CreatedDate DESC LIMIT 1];

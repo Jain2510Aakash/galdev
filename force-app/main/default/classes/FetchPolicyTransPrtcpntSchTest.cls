@@ -35,13 +35,12 @@ private class FetchPolicyTransPrtcpntSchTest {
 
     private static void setupTestData() {
         // Insert required Custom Setting
-        insurex__c setting = new insurex__c(
-            Name = 'insurex',
-            endpoint__c = 'https://test.com/',
-            insightUsername__c = 'testuser',
-            insightPassword__c = 'testpass'
-        );
-        insert setting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
 
         // Create Account
         Account acc = new Account(
@@ -124,13 +123,12 @@ private class FetchPolicyTransPrtcpntSchTest {
     @isTest
     static void testCatchBlock() {
          // Insert required Custom Setting
-        insurex__c setting = new insurex__c(
-            Name = 'insurex',
-            endpoint__c = 'https://test.com/',
-            insightUsername__c = 'testuser',
-            insightPassword__c = 'testpass'
-        );
-        insert setting;
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c();
+		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Username__c='testabc';
+        insightAPI.Insight_Password__c='testcardasf';
+        insert insightAPI;
 
         // Create Account
         Account acc = new Account(

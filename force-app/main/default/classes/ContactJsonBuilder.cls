@@ -6,6 +6,7 @@
 * Change log
 *
 * Author            Date            Description
+* Aakash Jain 	 	11-July-2025	handled fax and phone length
 * ==============================================================================================================================================================
  
 ****************************************************/
@@ -28,10 +29,19 @@ public class ContactJsonBuilder {
         if (con.Name != null) contact.put('Addressee', con.Name);
         if (con.Salutation != null) contact.put('Salutation', con.Salutation);
         if (con.Title != null) contact.put('JobTitle', con.Title);
-        if (con.Phone != null) contact.put('Telephone', con.Phone);
         if (con.OtherPhone != null) contact.put('Telephone2', con.OtherPhone);
         if (con.MobilePhone != null) contact.put('Mobile', con.MobilePhone);
-        if (con.Fax != null) contact.put('Fax', con.Fax);
+        
+        String phone = con.Phone != null ? con.Phone.trim() : null;
+        if (phone != null) {
+            phone = phone.length() > 15 ? phone.substring(0, 15) : phone;
+            contact.put('Telephone', phone);
+        }
+        String Fax = con.Fax != null ? con.Fax.trim() : null;
+        if (Fax != null) {
+            Fax = Fax.length() > 15 ? Fax.substring(0, 15) : Fax;
+            contact.put('Fax', Fax);
+        }   
         if (con.Email != null) contact.put('Email', con.Email);
         if (con.Birthdate != null) contact.put('BirthDate', con.Birthdate);
         

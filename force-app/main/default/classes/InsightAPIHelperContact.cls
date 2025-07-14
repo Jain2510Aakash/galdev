@@ -7,6 +7,9 @@
 *
 * Author            Date            Description
 * Aakash Jain 		8-July-2025		added settimeout for request and error log fields
+* Aakash Jain 	 	11-July-2025	handled fax and phone length
+* Aakash Jain 	 	11-July-2025	handled Contact Update API -getting the details for createdwhen and createdwho
+
 * ==============================================================================================================================================================
  
 ****************************************************/
@@ -23,7 +26,7 @@ public class InsightAPIHelperContact {
         
         system.debug('con->'+con);
         //custom setting
-        List<insurex__c> insurexCS = insurex__c.getall().values();
+        List<Insight_API_Details__c> insightAPI = Insight_API_Details__c.getall().values();
         
         String endpointPath = '';
         String httpMethod = 'POST';
@@ -46,9 +49,9 @@ public class InsightAPIHelperContact {
         
         HttpRequest req = new HttpRequest();
         req.setMethod('POST');
-        req.setEndpoint(insurexCS[0].endpoint__c + endpointPath);
-        req.setHeader('INSIGHT-USERNAME', insurexCS[0].insightUsername__c);
-        req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
+        req.setEndPoint(insightAPI[0].Insight_Endpoint__c+endpointPath);
+        req.setHeader('INSIGHT-USERNAME', insightAPI[0].Insight_Username__c);
+        req.setHeader('INSIGHT-PASSWORD', insightAPI[0].Insight_Password__c);
         req.setHeader('Content-Type', 'application/json');
         req.setTimeout(60000);        
         
@@ -124,7 +127,7 @@ public class InsightAPIHelperContact {
     }
     
     public static void getContactDetails(string conInsightId, string contactId){
-        List<insurex__c> insurexCS = insurex__c.getall().values();
+        List<Insight_API_Details__c> insightAPI = Insight_API_Details__c.getall().values();
         
         String endpointPath = '/Contact/get';
         String httpMethod = 'POST'; 
@@ -133,9 +136,9 @@ public class InsightAPIHelperContact {
         if(!string.isBlank(conInsightId)){
             HttpRequest req = new HttpRequest();
             req.setMethod(httpMethod);
-            req.setEndpoint(insurexCS[0].endpoint__c + endpointPath);
-            req.setHeader('INSIGHT-USERNAME', insurexCS[0].insightUsername__c);
-            req.setHeader('INSIGHT-PASSWORD', insurexCS[0].insightPassword__c);
+            req.setEndPoint(insightAPI[0].Insight_Endpoint__c+endpointPath);
+        	req.setHeader('INSIGHT-USERNAME', insightAPI[0].Insight_Username__c);
+        	req.setHeader('INSIGHT-PASSWORD', insightAPI[0].Insight_Password__c);
             req.setHeader('Content-Type', 'application/json');
             req.setTimeout(60000);        
 
@@ -161,7 +164,7 @@ public class InsightAPIHelperContact {
                     Integer parentId = (Integer) contact.get('ParentId');
                     
                     if(!String.isBlank(rowVersion)){
-                        updateContactDetailsOnInsight(rowVersion,parentId, contactId);
+                        updateContactDetailsOnInsight(jsonResponse, contactId);
                     }
                 } else {
                     // Handle API error responses
@@ -192,19 +195,90 @@ public class InsightAPIHelperContact {
             }    
         }
     }
-    public static void updateContactDetailsOnInsight(string rowVersion, Integer parentId, String contactId){
-        if(String.isBlank(rowVersion) || String.isBlank(String.ValueOf(parentId)) || String.isBlank(contactId)){
+    
+    public static void updateContactDetailsOnInsight(string originalJson, String contactId){
+        if(String.isBlank(originalJson) || String.isBlank(contactId)){
             mm_Integration_Log__c log = new mm_Integration_Log__c();
             log.Contact__c = contactId;
-            log.mm_Error_Description__c = 'rowVersion->'+rowVersion+'\n contactId->'+contactId+'\n parentId->'+parentId;
+            log.mm_Error_Description__c = originalJson;
             log.mm_Log_Time__c = system.now();
-            log.mm_Failing_Component__c = 'InsightAPIHelperContact <-> updateContactDetailsOnInsight';
+            log.mm_Failing_Component__c = 'InsightAPIHelperContact <-> updateContactDetailsOnInsight'+'\n\n contactId->'+contactId;
             insert log;
-         
             return;
             
         }
+        String endpointPath = '/Contact/Update';
+        String httpMethod = 'POST';
+        String jsonResponse='';
+        List<Insight_API_Details__c> insightAPI = Insight_API_Details__c.getall().values();
+        
+        HttpRequest req = new HttpRequest();
+        req.setMethod('POST');
+        req.setEndPoint(insightAPI[0].Insight_Endpoint__c+endpointPath);
+        req.setHeader('INSIGHT-USERNAME', insightAPI[0].Insight_Username__c);
+        req.setHeader('INSIGHT-PASSWORD', insightAPI[0].Insight_Password__c);
+        req.setHeader('Content-Type', 'application/json');
+        req.setTimeout(60000);        
+        
+        Map<String, Object> parsedResponse = (Map<String, Object>) JSON.deserializeUntyped(originalJson);
+        Map<String, Object> contactObj = (Map<String, Object>) parsedResponse.get('Contact');
+        String addressee = (String) contactObj.get('Addressee');
+        
         Contact con = [SELECT Id, Addressee__c ,Birthdate ,Email ,Fax ,mm_Created_When__c ,mm_Created_Who__c ,mm_External_Id__c ,mm_Is_Primary_Contact__c ,MobilePhone ,Name ,OtherPhone ,Phone ,Salutation ,Title,Account.mm_INSIGHTS_Id__c, RowVersion__c from Contact where Id = :contactId  LIMIT 1];
-        InsightAPIHelperContact.sendContactDetails(con,'update',rowVersion, parentId);    
+    
+        contactObj.put('IsPrimary', con.mm_Is_Primary_Contact__c);
+        if (con.Name != null) contactObj.put('Addressee', con.Name);
+        if (con.Salutation != null) contactObj.put('Salutation', con.Salutation);
+        if (con.Title != null) contactObj.put('JobTitle', con.Title);
+        if (con.OtherPhone != null) contactObj.put('Telephone2', con.OtherPhone);
+        if (con.MobilePhone != null) contactObj.put('Mobile', con.MobilePhone);
+        
+        String phone = con.Phone != null ? con.Phone.trim() : null;
+        if (phone != null) {
+            phone = phone.length() > 15 ? phone.substring(0, 15) : phone;
+            contactObj.put('Telephone', phone);
+        }
+        String Fax = con.Fax != null ? con.Fax.trim() : null;
+        if (Fax != null) {
+            Fax = Fax.length() > 15 ? Fax.substring(0, 15) : Fax;
+            contactObj.put('Fax', Fax);
+        }   
+        
+        if (con.Email != null) contactObj.put('Email', con.Email);
+        if (con.Birthdate != null) contactObj.put('BirthDate', con.Birthdate);
+        parsedResponse.put('Contact', contactObj);
+        String modifiedJson = JSON.serialize(parsedResponse);
+        integer statusCode;
+        
+        req.setBody(modifiedJson);
+        System.debug('Final Update Request JSON: ' + modifiedJson);         
+        Http http = new Http();
+        try {
+            HttpResponse res = http.send(req);
+            statusCode  = res.getStatusCode();
+            jsonResponse = res.getBody();
+            if(res.getStatusCode() != 200){
+                mm_Integration_Log__c log = new mm_Integration_Log__c();
+                log.Contact__c = contactId;
+                log.Status_Code__c = String.valueOf(statusCode);
+                log.mm_Error_Description__c = jsonResponse;
+                log.Request_Endpoint__c = endpointPath;
+                log.mm_Payload__c =  'requestBody->'+modifiedJson;   
+                log.mm_Log_Time__c = system.now();
+                log.mm_Failing_Component__c = 'InsightAPIHelperContact <-> updateContactDetailsOnInsight'+'\n\n contactId->'+contactId;
+                insert log;
+            }
+        }catch (Exception ex) {
+            mm_Integration_Log__c log = new mm_Integration_Log__c();
+            log.Contact__c = contactId;
+            log.Status_Code__c = String.valueOf(statusCode);
+            log.mm_Error_Description__c = jsonResponse;
+            log.Request_Endpoint__c = endpointPath;
+            log.mm_Payload__c =  'requestBody->'+modifiedJson;   
+            log.mm_Log_Time__c = system.now();
+            log.mm_Failing_Component__c = 'InsightAPIHelperContact <-> updateContactDetailsOnInsight'+'\n\n contactId->'+contactId;
+            log.mm_Message__c = 'ErrorMessage  ->'+ex.getMessage()+'\n\n Error line ->'+ex.getLineNumber()+'\n\n Stack Trace ->'+ex.getStackTraceString()+'\n\ngetCause->'+ex.getCause();
+            insert log;
+        }  
     }
 }
