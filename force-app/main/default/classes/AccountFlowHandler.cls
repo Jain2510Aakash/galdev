@@ -50,7 +50,7 @@ public class AccountFlowHandler {
     public static void handleUpdate(string accId){        
         string accInsightId = [SELECT Id,mm_INSIGHTS_Id__c from Account where Id = :accId LIMIT 1].mm_INSIGHTS_Id__c;
         if(!string.isBlank(accInsightId)){
-            //InsightAPIHelper.getClientDetails(accInsightId,accId);
+            InsightAPIHelper.getClientDetails(accInsightId,accId);
         }
     }
 }
