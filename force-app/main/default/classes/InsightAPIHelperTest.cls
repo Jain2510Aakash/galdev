@@ -1,6 +1,6 @@
 @isTest
 public class InsightAPIHelperTest {
-
+    
     
     // Define a mock response class for a successful response
     class MockHttpResponseGenerator implements HttpCalloutMock {
@@ -27,12 +27,12 @@ public class InsightAPIHelperTest {
     static void testSendClientDetails_Create() {
         // Step 1: Create a mock Custom Setting for the callout
         Insight_API_Details__c insightAPI = new Insight_API_Details__c();
-		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
-		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+        insightAPI.Name='insightAPI';
         insightAPI.Insight_Username__c='testabc';
         insightAPI.Insight_Password__c='testcardasf';
         insert insightAPI;
-
+        
         
         // Step 2: Create a test account for sending the details
         Account testAccount = new Account(
@@ -60,18 +60,18 @@ public class InsightAPIHelperTest {
         Account updatedAccount = [SELECT mm_INSIGHTS_Id__c, mm_Created_When__c, mm_Created_Who__c, RowVersion__c FROM Account WHERE Id = :testAccount.Id];
         System.assertEquals('123', updatedAccount.mm_INSIGHTS_Id__c, 'The mm_INSIGHTS_Id__c should be updated');
         System.assertEquals('2025-01-01', updatedAccount.mm_Created_When__c, 'The mm_Created_When__c should be updated');
-        }
+    }
     
     @isTest
     static void testSendClientDetails_Update() {
         // Create a mock Custom Setting for the callout
         Insight_API_Details__c insightAPI = new Insight_API_Details__c();
-		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
-		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+        insightAPI.Name='insightAPI';
         insightAPI.Insight_Username__c='testabc';
         insightAPI.Insight_Password__c='testcardasf';
         insert insightAPI;
-
+        
         
         // Create a test account for sending the details
         Account testAccount = new Account(
@@ -93,18 +93,18 @@ public class InsightAPIHelperTest {
         Test.startTest();
         InsightAPIHelper.sendClientDetails(testAccount, 'update', null, null);
         Test.stopTest();
- }
+    }
     
     @isTest
     static void testSendClientDetails_ErrorHandling() {
         // Create a mock Custom Setting for the callout
         Insight_API_Details__c insightAPI = new Insight_API_Details__c();
-		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
-		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+        insightAPI.Name='insightAPI';
         insightAPI.Insight_Username__c='testabc';
         insightAPI.Insight_Password__c='testcardasf';
         insert insightAPI;
-
+        
         
         // Create a test account for sending the details
         Account testAccount = new Account(
@@ -127,7 +127,7 @@ public class InsightAPIHelperTest {
         InsightAPIHelper.sendClientDetails(testAccount, 'create', null, null);
         InsightAPIHelper.sendClientDetails(testAccount, 'update', null, null);
         Test.stopTest();
-      }
+    }
     
     @isTest
     static void testSendClientDetails_AccountNull() {
@@ -142,12 +142,12 @@ public class InsightAPIHelperTest {
     static void testGetClientDetails_Success() {
         // Setup custom setting
         Insight_API_Details__c insightAPI = new Insight_API_Details__c();
-		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
-		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+        insightAPI.Name='insightAPI';
         insightAPI.Insight_Username__c='testabc';
         insightAPI.Insight_Password__c='testcardasf';
         insert insightAPI;
-
+        
         
         // Insert test account
         Account acc = new Account(Name = 'Client Get Test');
@@ -166,12 +166,12 @@ public class InsightAPIHelperTest {
     static void testUpdateClientDetailsOnInsight_ValidData() {
         // Insert required custom setting
         Insight_API_Details__c insightAPI = new Insight_API_Details__c();
-		insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
-		insightAPI.Name='insightAPI';
+        insightAPI.Insight_Endpoint__c='https://galvaniizeinsurance--devenv.sandbox.my.salesforce-setup.com/servlet/servlet.ExternalRedirect?url=https%3A%2F%2Frc-insurex-tstinsrx.insightbroking.com.au%2FServices&';
+        insightAPI.Name='insightAPI';
         insightAPI.Insight_Username__c='testabc';
         insightAPI.Insight_Password__c='testcardasf';
         insert insightAPI;
-
+        
         
         // Insert test account
         Account acc = new Account(Name = 'Update Client Insight',mm_INSIGHTS_Id__c = '123');
@@ -180,7 +180,7 @@ public class InsightAPIHelperTest {
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         
         Test.startTest();
-        InsightAPIHelper.updateClientDetailsOnInsight('{"Client": {"AuditId": 123, "CreatedWhen": "2025-01-01", "CreatedWho": "Test User", "RowVersion": "1.0"}}', acc.Id);
+        InsightAPIHelper.updateClientDetailsOnInsight('{"Client": {"AuditId": 123, "CreatedWhen": "2025-01-01", "CreatedWho": "Test User", "RowVersion": "1.0","StandardIndustryCode":"123","StandardIndustryCodeName":"testing"}}', acc.Id);
         Test.stopTest();
         
         System.assertEquals(1, [SELECT count() FROM Account WHERE Id = :acc.Id]);
@@ -195,5 +195,113 @@ public class InsightAPIHelperTest {
         List<mm_Integration_Log__c> logs = [SELECT Id, mm_Error_Description__c FROM mm_Integration_Log__c LIMIT 1];
     }
     
+    class MalformedJsonMock implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setStatusCode(200);
+            res.setBody('Invalid JSON');  // Causes JSON.deserializeUntyped to throw
+            return res;
+        }
+    }
+    
+    @isTest
+    static void testSendClientDetails_JsonParseFailure() {
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c(
+            Name='insightAPI',
+            Insight_Endpoint__c='https://test-endpoint/',
+            Insight_Username__c='user',
+            Insight_Password__c='pass'
+        );
+        insert insightAPI;
+        
+        Account acc = new Account(Name='Error Account');
+        insert acc;
+        
+        Test.setMock(HttpCalloutMock.class, new MalformedJsonMock());
+        
+        Test.startTest();
+        InsightAPIHelper.sendClientDetails(acc, 'create', null, null);
+        Test.stopTest();
+        
+    }
+    class ThrowExceptionMock implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            // Simulate callout throwing exception
+            throw new CalloutException('Simulated exception');
+        }
+    }
+    
+    @isTest
+    static void testUpdateClientDetailsOnInsight_CalloutException() {
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c(
+            Name='insightAPI',
+            Insight_Endpoint__c='https://test-endpoint/',
+            Insight_Username__c='user',
+            Insight_Password__c='pass'
+        );
+        insert insightAPI;
+        
+        Account acc = new Account(Name='Exception Account', mm_INSIGHTS_Id__c='123');
+        insert acc;
+        
+        Test.setMock(HttpCalloutMock.class, new ThrowExceptionMock());
+        
+        Test.startTest();
+        InsightAPIHelper.updateClientDetailsOnInsight(
+            '{"Client": {"AuditId": 123, "CreatedWhen": "2025-01-01", "CreatedWho": "Test User", "RowVersion": "1.0","StandardIndustryCode":"123","StandardIndustryCodeName":"testing"}}',
+            acc.Id
+        );
+        Test.stopTest();
+        
+    }
+    @isTest
+    static void testGetClientDetails_ErrorStatus() {
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c(
+            Name='insightAPI',
+            Insight_Endpoint__c='https://test-endpoint/',
+            Insight_Username__c='user',
+            Insight_Password__c='pass'
+        );
+        insert insightAPI;
+        
+        Account acc = new Account(Name='Error Account');
+        insert acc;
+        
+        Test.setMock(HttpCalloutMock.class, new MockHttpErrorResponse());
+        
+        Test.startTest();
+        InsightAPIHelper.getClientDetails('123', acc.Id);
+        Test.stopTest();
+        
+    }
+    class BadJsonClientMock implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setStatusCode(200);
+            res.setBody('{"Client": "missing closing brace"');  // Malformed JSON
+            return res;
+        }
+    }
+    
+    @isTest
+    static void testGetClientDetails_MalformedJson() {
+        Insight_API_Details__c insightAPI = new Insight_API_Details__c(
+            Name='insightAPI',
+            Insight_Endpoint__c='https://test-endpoint/',
+            Insight_Username__c='user',
+            Insight_Password__c='pass'
+        );
+        insert insightAPI;
+        
+        Account acc = new Account(Name='Malformed JSON');
+        insert acc;
+        
+        Test.setMock(HttpCalloutMock.class, new BadJsonClientMock());
+        
+        Test.startTest();
+        InsightAPIHelper.getClientDetails('123', acc.Id);
+        Test.stopTest();
+        
+    }
     
 }
