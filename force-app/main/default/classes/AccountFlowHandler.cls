@@ -35,22 +35,26 @@ public class AccountFlowHandler {
    
     @future(callout = true)
     public static void handleCreate(string accId){
-        Account acc = [SELECT Id, Name, BillingStreet, BillingCity, BillingState, BillingPostalCode, BillingCountry, Phone, Fax, 
-                       Client_Status__pc, mm_ABA_Reference_Number__c, mm_Account_Email__c, mm_Account_Name__c, Website, Industry, 
-                       PersonEmail, PersonMobilePhone, Addressee__pc, mm_Addressee__c, mm_Allow_Part_Payments__c, mm_Account_Number__c,
-                       FinServ__PrimaryContact__c,PersonTitle, mm_Bank_Name__c, mm_Authorised_Rep__c, mm_Branch__c, mm_Branch_Name__c,  mm_Service_Team__c,
-                       mm_Client_Permissions_Groups__c, mm_Code__c, mm_Company_ABN__c, mm_Compliance_Type__c, mm_Created_When__c, AccountNumber,
-                       mm_Created_Who__c, mm_INSIGHTS_Id__c, mm_Phone_Other__c, mm_Referrer__c, mm_Standard_Industry_Code__c, mm_Trading_Name__c, User__c, 
-                       mm_BSB_Number__c,mm_Current_State__c ,mm_Email_Policy_Documents__c,mm_Client_ID__c,CreatedDate,LastModifiedDate,RowVersion__c from Account where Id = :accId LIMIT 1];
+        List<Account> accountList = [SELECT Id, Name, BillingStreet, BillingCity, BillingState, BillingPostalCode, BillingCountry, Phone, Fax, 
+                                     Client_Status__pc, mm_ABA_Reference_Number__c, mm_Account_Email__c, mm_Account_Name__c, Website, Industry, 
+                                     PersonEmail, PersonMobilePhone, Addressee__pc, mm_Addressee__c, mm_Allow_Part_Payments__c, mm_Account_Number__c,
+                                     FinServ__PrimaryContact__c,PersonTitle, mm_Bank_Name__c, mm_Authorised_Rep__c, mm_Branch__c, mm_Branch_Name__c,  mm_Service_Team__c,
+                                     mm_Client_Permissions_Groups__c, mm_Code__c, mm_Company_ABN__c, mm_Compliance_Type__c, mm_Created_When__c, AccountNumber,
+                                     mm_Created_Who__c, mm_INSIGHTS_Id__c, mm_Phone_Other__c, mm_Referrer__c, mm_Standard_Industry_Code__c, mm_Trading_Name__c, User__c, 
+                                     mm_BSB_Number__c,mm_Current_State__c ,mm_Email_Policy_Documents__c,mm_Client_ID__c,CreatedDate,LastModifiedDate,RowVersion__c from Account where Id = :accId LIMIT 1];
         system.debug('sendClientDetails->'+'Create Client');
-        InsightAPIHelper.sendClientDetails(acc,'create', null, null);
+        if(!accountList.isEmpty())
+            InsightAPIHelper.sendClientDetails(accountList[0],'create', null, null);
     }
     
     @future(callout = true)
     public static void handleUpdate(string accId){        
-        string accInsightId = [SELECT Id,mm_INSIGHTS_Id__c from Account where Id = :accId LIMIT 1].mm_INSIGHTS_Id__c;
-        if(!string.isBlank(accInsightId)){
-            InsightAPIHelper.getClientDetails(accInsightId,accId);
-        }
+        List<Account> accountList = [SELECT Id,mm_INSIGHTS_Id__c from Account where Id = :accId LIMIT 1];
+        if(!accountList.isEmpty()){
+            string accInsightId = accountList[0].mm_INSIGHTS_Id__c;
+            if(!string.isBlank(accInsightId)){
+                InsightAPIHelper.getClientDetails(accInsightId,accId);
+            }
+        }       
     }
 }
