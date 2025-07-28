@@ -148,6 +148,15 @@ public class FetchPolicyTransactionFromInsight {
                                     if(record.PolicyTeamId != null && getPolicyTeamIdSF(record.PolicyTeamId) != null){
                                         iptRecord.PolicyTeamId__c = getPolicyTeamIdSF(record.PolicyTeamId);
                                     }
+                                    if(record.ToDate != null){    
+                                        iptRecord.mm_Expiration_Date__c = Date.valueOf(record.ToDate); 
+                                    }
+                                    if(record.CommFeeGST != null){
+                                        iptRecord.mm_Comm_Fee_GST__c = record.CommFeeGST;
+                                    }
+                                    if(record.GrossInsurerPremium != null){
+                                        iptRecord.mm_Gross_Written_Premium__c = record.GrossInsurerPremium;
+                                    }
                                     
                                     //if exists assign id else assign mm_External_Id__c
                                     if(policyTransExternalIdByPolicyTransId.containsKey(string.valueOf(record.Id))){
@@ -362,6 +371,15 @@ public class FetchPolicyTransactionFromInsight {
                                     iptRecord.InsurancePolicyId = policyExternalIdByPolicyId.get(String.ValueOf(record.policyId));
                                     if(record.PolicyTeamId != null && getPolicyTeamIdSF(record.PolicyTeamId) != null){
                                         iptRecord.PolicyTeamId__c = getPolicyTeamIdSF(record.PolicyTeamId);
+                                    }
+                                    if(record.ToDate != null){    
+                                        iptRecord.mm_Expiration_Date__c = Date.valueOf(record.ToDate); 
+                                    }
+                                    if(record.CommFeeGST != null){
+                                        iptRecord.mm_Comm_Fee_GST__c = record.CommFeeGST;
+                                    }
+                                    if(record.GrossInsurerPremium != null){
+                                        iptRecord.mm_Gross_Written_Premium__c = record.GrossInsurerPremium;
                                     }
                                     
                                     //if exists assign id else assign mm_External_Id__c

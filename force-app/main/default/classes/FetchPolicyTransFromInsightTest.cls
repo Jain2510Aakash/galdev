@@ -8,7 +8,7 @@ public class FetchPolicyTransFromInsightTest {
             res.setStatusCode(200);
             
             // Sample mock response with one record
-            res.setBody('{ "Results": [{ "Id":123,"PolicyId":"1243256","accountId":"001xx000003NG9z","EffectiveDate":"2025-06-01","TransactionNumber": "T-0001","TransactionTypeName": "New Business","Name": "Test Transaction","IsClosed": true,"HasMultiClient": false}]}');
+            res.setBody('{ "Results": [{ "Id":123,"PolicyId":"1243256","accountId":"001xx000003NG9z","EffectiveDate":"2025-06-01","TransactionNumber": "T-0001","TransactionTypeName": "New Business","Name": "Test Transaction","IsClosed": true,"HasMultiClient": false,"ToDate":"2026-07-10","CommFeeGST":45.0900,"GrossInsurerPremium":3466.9800}]}');
             return res;
         }
     }

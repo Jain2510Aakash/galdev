@@ -84,5 +84,7 @@ public class PolicyTransactionWrapper {
         public String accountId;
         public String Name;
         public Integer PolicyTeamId;
+        public Date ToDate;
+        public Decimal CommFeeGST;
     }
 }

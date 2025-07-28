@@ -11,7 +11,7 @@ public class FetchPolicyFromInsightTest {
                         '"Description":"Test Policy","TypeDescription":"Auto","EffectiveDate":"2023-01-01",' +
                         '"FromDate":"2023-01-01","ToDate":"2024-01-01","Insured":"John Doe","NumTransactions":5,' +
                         '"IsInstalmentPolicy":true,"Period":1,"HasCoinsurance":false,' +
-                        '"HasMultiClient":false,"StandardIndustryCode":"SIC001"}]}');
+                        '"HasMultiClient":false,"StandardIndustryCode":"SIC001","InsurerId":149}]}');
             return res;
         }
     }
@@ -57,6 +57,18 @@ public class FetchPolicyFromInsightTest {
             Phone = '555-555-5555'
         );
         insert acc;
+        
+         Account acc1 = new Account(
+            Name = 'Test Account1',
+            mm_INSIGHTS_Id__c = '149',
+            BillingStreet = '123 Main Stdsfs',
+            BillingCity = 'Test Cityfsf',
+            BillingState = 'Queensland',
+            BillingPostalCode = '321025',
+            BillingCountry = 'Australia',
+            Phone = '2020'
+        );
+        insert acc1;
         
         // Create Insurance Policy
         InsurancePolicy policy = new InsurancePolicy(

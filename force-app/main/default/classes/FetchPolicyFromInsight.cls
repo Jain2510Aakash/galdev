@@ -25,6 +25,10 @@ public class FetchPolicyFromInsight {
         List<mm_Integration_Log__c> errorLogs = new List<mm_Integration_Log__c>();
         Map<String, String> clientIdByAccountIdMap = new Map<String, String>();
         Map<String, String> insightPolicyIdByInsurancePolicyIdMap = new Map<String, String>();
+        Set<String> policyInsurerIdSet  = new Set<String>();
+        List<Account> insuredAccntList = new List<Account>();
+        Map<String,String> insuredIdByAccntIdMap = new Map<string,string>();
+        
         
         HttpRequest req = new HttpRequest();
         req.setMethod(httpMethod);
@@ -47,9 +51,11 @@ public class FetchPolicyFromInsight {
                 for (PolicyWrapper.PolicyRecord record : wrapper.Results) {
                     clientIdsSet.add(string.valueOf(record.ClientId));
                     policyInsightIdSet.add(string.valueOf(record.Id));
+                    policyInsurerIdSet.add(string.valueOf(record.InsurerId));
                 }
                 system.debug('clientIdsSet->'+clientIdsSet);
                 system.debug('policyInsightIdSet->'+policyInsightIdSet);
+                system.debug('policyInsurerIdSet->'+policyInsurerIdSet);
                 
                 if(!policyInsightIdSet.isEmpty()){
                     existingInsurancePolicy = [Select Id,mm_External_Id__c From InsurancePolicy where mm_External_Id__c IN : policyInsightIdSet];
@@ -60,11 +66,25 @@ public class FetchPolicyFromInsight {
                         }
                     }
                 }
+                if(!policyInsurerIdSet.isEmpty()){
+                    system.debug('PolicyInsuredIdSet->'+policyInsurerIdSet);
+                    insuredAccntList = [Select Id, mm_INSIGHTS_Id__c From Account where mm_INSIGHTS_Id__c in : policyInsurerIdSet];
+                    system.debug('insuredAccountList->'+insuredAccntList);
+                    if(!insuredAccntList.isEmpty()){
+                        for(Account acc : insuredAccntList){ 
+                            insuredIdByAccntIdMap.put(acc.mm_INSIGHTS_Id__c,acc.Id);
+                            system.debug('acc.mm_INSIGHTS_Id__c->'+acc.mm_INSIGHTS_Id__c);
+                            system.debug('acc.Id->'+acc.Id);           
+                        }       
+                    }
+                }
+                
                 system.debug('insightPolicyIdByInsurancePolicyIdMap->'+insightPolicyIdByInsurancePolicyIdMap);
                 
                 if(!clientIdsSet.isEmpty()){
                     accountList = [Select Id, mm_INSIGHTS_Id__c From Account where mm_INSIGHTS_Id__c in : clientIdsSet];
                     system.debug('accountList->'+accountList);
+                    
                     if(!accountList.isEmpty()){
                         for(Account acc : accountList){
                             clientIdByAccountIdMap.put(acc.mm_INSIGHTS_Id__c, acc.Id);
@@ -89,12 +109,20 @@ public class FetchPolicyFromInsight {
                                     if(record.Period !=null) IPrecToInsert.mm_Period__c = record.Period;
                                     IPrecToInsert.mm_Has_Coinsurance__c = record.HasCoinsurance;
                                     IPrecToInsert.mm_Has_Multipleclient__c = record.HasMultiClient;
-                                    if(record.StandardIndustryCode !=null) IPrecToInsert.mm_Standard_Industry_Code__c = record.StandardIndustryCode;                                    IPrecToInsert.ReferencePolicyNumber = record.PolicyNumber;
+                                    if(record.StandardIndustryCode !=null) IPrecToInsert.mm_Standard_Industry_Code__c = record.StandardIndustryCode;                                    
+                                    IPrecToInsert.ReferencePolicyNumber = record.PolicyNumber;
                                     if(record.PolicyNumber !=null) IPrecToInsert.ReferencePolicyNumber = record.PolicyNumber;
-                                    if(record.PolicyNumber !=null) IPrecToInsert.mm_CBN_Policy_Number__c = record.PolicyNumber;                                    if(record.ClassOfRisk != null && record.ClassOfRiskId != null && record.InsurerId != null)
+                                    if(record.PolicyNumber !=null) IPrecToInsert.mm_CBN_Policy_Number__c = record.PolicyNumber;                                   
+                                    if(record.ClassOfRisk != null && record.ClassOfRiskId != null && record.InsurerId != null)
                                         IPrecToInsert.ProductId = getClassofRiskIdSF(record.ClassOfRisk, record.ClassOfRiskId, record.InsurerId);
                                     if(record.PolicyTeamId != null && getPolicyTeamIdSF(record.PolicyTeamId) != null){
                                         IPrecToInsert.PolicyTeamId__c = getPolicyTeamIdSF(record.PolicyTeamId);                                       
+                                    }
+                                    if(record.InsurerId != null && insuredIdByAccntIdMap.containsKey(String.ValueOf(record.InsurerId))){    
+                                        IPrecToInsert.mm_Insurer__c = insuredIdByAccntIdMap.get(String.ValueOf(record.InsurerId));
+                                    }
+                                    if(record.ToDate != null){    
+                                        IPrecToInsert.ExpirationDate = DateTime.newInstance(record.ToDate, Time.newInstance(0, 0, 0, 0));
                                     }
                                     
                                     system.debug('insightPolicyIdByInsurancePolicyIdMap.containsKey(string.valueOf(record.Id))->'+insightPolicyIdByInsurancePolicyIdMap.containsKey(string.valueOf(record.Id)));
@@ -183,6 +211,9 @@ public class FetchPolicyFromInsight {
         List<mm_Integration_Log__c> errorLogs = new List<mm_Integration_Log__c>();
         Map<String, String> clientIdByAccountIdMap = new Map<String, String>();
         Map<String, String> insightPolicyIdByInsurancePolicyIdMap = new Map<String, String>();
+        Set<String> policyInsurerIdSet  = new Set<String>();
+        List<Account> insuredAccntList = new List<Account>();
+        Map<String,String> insuredIdByAccntIdMap = new Map<string,string>();
         
         HttpRequest req = new HttpRequest();
         req.setMethod(httpMethod);
@@ -205,6 +236,7 @@ public class FetchPolicyFromInsight {
                 for (PolicyWrapper.PolicyRecord record : wrapper.Results) {
                     clientIdsSet.add(string.valueOf(record.ClientId));
                     policyInsightIdSet.add(string.valueOf(record.Id));
+                    policyInsurerIdSet.add(string.valueOf(record.InsurerId));
                 }
                 system.debug('clientIdsSet->'+clientIdsSet);
                 system.debug('policyInsightIdSet->'+policyInsightIdSet);
@@ -219,7 +251,17 @@ public class FetchPolicyFromInsight {
                     }
                 }
                 system.debug('insightPolicyIdByInsurancePolicyIdMap->'+insightPolicyIdByInsurancePolicyIdMap);
-                
+                if(!policyInsurerIdSet.isEmpty()){
+                    insuredAccntList = [Select Id, mm_INSIGHTS_Id__c From Account where mm_INSIGHTS_Id__c in : policyInsurerIdSet];
+                    system.debug('insuredAccountList->'+insuredAccntList);
+                    if(!insuredAccntList.isEmpty()){
+                        for(Account acc : insuredAccntList){ 
+                            insuredIdByAccntIdMap.put(acc.mm_INSIGHTS_Id__c,acc.Id);
+                            system.debug('acc.mm_INSIGHTS_Id__c->'+acc.mm_INSIGHTS_Id__c);
+                            system.debug('acc.Id->'+acc.Id);           
+                        }       
+                    }
+                }
                 if(!clientIdsSet.isEmpty()){
                     accountList = [Select Id, mm_INSIGHTS_Id__c From Account where mm_INSIGHTS_Id__c in : clientIdsSet];
                     system.debug('accountList->'+accountList);
@@ -229,6 +271,7 @@ public class FetchPolicyFromInsight {
                             system.debug('acc.mm_INSIGHTS_Id__c->'+acc.mm_INSIGHTS_Id__c);
                             system.debug('acc.Id->'+acc.Id);
                         }
+                        
                         if(!clientIdByAccountIdMap.isEmpty()){
                             for (PolicyWrapper.PolicyRecord record : wrapper.Results) {
                                 if(clientIdByAccountIdMap.ContainsKey(String.ValueOf(record.ClientId)) && record.PolicyNumber != null){
@@ -254,7 +297,13 @@ public class FetchPolicyFromInsight {
                                         IPrecToInsert.ProductId = getClassofRiskIdSF(record.ClassOfRisk, record.ClassOfRiskId, record.InsurerId);
                                     if(record.PolicyTeamId != null && getPolicyTeamIdSF(record.PolicyTeamId) != null){
                                         IPrecToInsert.PolicyTeamId__c = getPolicyTeamIdSF(record.PolicyTeamId);                                       
-                                    } 
+                                    }
+                                    if(record.InsurerId != null && insuredIdByAccntIdMap.containsKey(String.ValueOf(record.InsurerId))){    
+                                        IPrecToInsert.mm_Insurer__c = insuredIdByAccntIdMap.get(String.ValueOf(record.InsurerId));
+                                    }
+                                    if(record.ToDate != null){    
+                                        IPrecToInsert.ExpirationDate = DateTime.valueOf(record.ToDate); 
+                                    }
                                     //if exists assign id else assign mm_External_Id__c
                                     system.debug('insightPolicyIdByInsurancePolicyIdMap.containsKey(string.valueOf(record.Id))->'+insightPolicyIdByInsurancePolicyIdMap.containsKey(string.valueOf(record.Id)));
                                     if(insightPolicyIdByInsurancePolicyIdMap.containsKey(string.valueOf(record.Id))){

@@ -276,7 +276,8 @@ public class InsightAPIHelper {
             if (accountList[0].mm_BSB_Number__c != null) client.put('BSBNumber', accountList[0].mm_BSB_Number__c);
             if (accountList[0].mm_ABA_Reference_Number__c != null) client.put('ABARefNumber', accountList[0].mm_ABA_Reference_Number__c);
             if (accountList[0].mm_Email_Policy_Documents__c != null) client.put('EmailPolicyDocuments', accountList[0].mm_Email_Policy_Documents__c);
-            
+            // if (acc.mm_Code__c != null) client.put('ClientCode', acc.mm_Code__c);
+
             integer CountryId;
             Integer stateId;
             Integer BranchId;

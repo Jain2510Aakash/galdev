@@ -84,6 +84,8 @@ public class ClientJsonBuilder {
         if (acc.mm_BSB_Number__c != null) client.put('BSBNumber', acc.mm_BSB_Number__c);
         if (acc.mm_ABA_Reference_Number__c != null) client.put('ABARefNumber', acc.mm_ABA_Reference_Number__c);
         if (acc.mm_Email_Policy_Documents__c != null) client.put('EmailPolicyDocuments', acc.mm_Email_Policy_Documents__c);
+        if (acc.mm_Email_Policy_Documents__c != null) client.put('EmailPolicyDocuments', acc.mm_Email_Policy_Documents__c);
+        // if (acc.mm_Code__c != null) client.put('ClientCode', acc.mm_Code__c);
         if (acc.Industry != null) client.put('StandardIndustryCodeName', acc.Industry);
         
         integer CountryId;
@@ -161,7 +163,7 @@ public class ClientJsonBuilder {
         
         // hardcoded values for CBN testing
 
-       /* client.put('CountryId', 14);
+       client.put('CountryId', 14);
         client.put('StateId', 7);
         client.put('BranchId', 4);
         client.put('RecordPermissionsGroupId', 4);
@@ -171,7 +173,7 @@ public class ClientJsonBuilder {
         client.put('BranchId', 4);
         client.put('ComplianceTypeId', 1);
         client.put('AuthorisedRep1Id', 142);    
-        client.put('Category1Id', 3);   */ 
+        client.put('Category1Id', 3); 
 
         
         Map<String, Object> wrapper = new Map<String, Object>{
