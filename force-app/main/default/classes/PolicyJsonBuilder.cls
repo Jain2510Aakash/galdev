@@ -29,8 +29,8 @@ public class PolicyJsonBuilder {
         string UpdatedWhenFrom = (System.now().addMinutes(-10)).format('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
         string UpdatedWhenTo = (System.now()).format('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'', 'UTC');
         
-        policy.put('UpdatedWhenTo', UpdatedWhenTo); 
-        policy.put('UpdatedWhenFrom', UpdatedWhenFrom); 
+        policy.put('UpdatedWhenTo', '2025-07-29T05:50:05Z'); 
+        policy.put('UpdatedWhenFrom', '2025-07-29T05:40:05Z'); 
         system.debug('policy->'+policy);
         
         return JSON.serialize(policy);

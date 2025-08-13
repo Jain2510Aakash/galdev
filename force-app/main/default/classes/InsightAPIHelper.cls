@@ -196,7 +196,7 @@ public class InsightAPIHelper {
                                      FinServ__PrimaryContact__c,PersonTitle, mm_Bank_Name__c, mm_Authorised_Rep__c, mm_Branch__c, mm_Branch_Name__c, 
                                      mm_Client_Permissions_Groups__c, mm_Code__c, mm_Company_ABN__c, mm_Compliance_Type__c, mm_Created_When__c, 
                                      mm_Created_Who__c, mm_INSIGHTS_Id__c, mm_Phone_Other__c, mm_Referrer__c, mm_Standard_Industry_Code__c, mm_Trading_Name__c, User__c, 
-                                     mm_BSB_Number__c,mm_Current_State__c ,mm_Email_Policy_Documents__c,mm_Client_ID__c,CreatedDate,LastModifiedDate,RowVersion__c,mm_Service_Team__c from Account Where Id =: accountId limit 1];
+                                     mm_BSB_Number__c,mm_Current_State__c,AccountNumber ,mm_Email_Policy_Documents__c,mm_Client_ID__c,CreatedDate,LastModifiedDate,RowVersion__c,mm_Service_Team__c from Account Where Id =: accountId limit 1];
         
         List<Insight_API_Details__c> insightAPI = Insight_API_Details__c.getall().values();
         String endpointPath = '/Client/update';
@@ -247,7 +247,7 @@ public class InsightAPIHelper {
             if (accountList[0].mm_Trading_Name__c != null) client.put('TradingAs', accountList[0].mm_Trading_Name__c);
             if (accountList[0].mm_Compliance_Type__c != null) client.put('ComplianceTypeName', accountList[0].mm_Compliance_Type__c);
             if (accountList[0].mm_Addressee__c != null) client.put('Addressee', accountList[0].mm_Addressee__c);
-            if (accountList[0].mm_Referrer__c != null) client.put('Ref', accountList[0].mm_Referrer__c.left(15)); 
+            if (accountList[0].mm_Code__c != null) client.put('Ref', accountList[0].mm_Code__c); 
             if (accountList[0].mm_Company_ABN__c != null) client.put('ABN', accountList[0].mm_Company_ABN__c);
             if (accountList[0].FinServ__PrimaryContact__c != null) client.put('Contact', accountList[0].FinServ__PrimaryContact__c);
             if (accountList[0].PersonTitle != null) client.put('JobTitle', accountList[0].PersonTitle);        
@@ -270,7 +270,7 @@ public class InsightAPIHelper {
             if (accountList[0].PersonMobilePhone != null) client.put('Mobile', accountList[0].PersonMobilePhone);
             if (accountList[0].Website != null) client.put('Web', accountList[0].Website);
             if (accountList[0].mm_Account_Name__c != null) client.put('AccountName', accountList[0].mm_Account_Name__c);
-            if (accountList[0].mm_Account_Number__c != null) client.put('AccountNumber', accountList[0].mm_Account_Number__c);
+            if (accountList[0].AccountNumber != null) client.put('AccountNumber', accountList[0].AccountNumber);
             if (accountList[0].mm_Bank_Name__c != null) client.put('BankName', accountList[0].mm_Bank_Name__c);
             if (accountList[0].mm_Branch_Name__c != null) client.put('BankBranchName', accountList[0].mm_Branch_Name__c);
             if (accountList[0].mm_BSB_Number__c != null) client.put('BSBNumber', accountList[0].mm_BSB_Number__c);
@@ -339,7 +339,7 @@ public class InsightAPIHelper {
             client.put('ComplianceTypeId', 1);
             client.put('AuthorisedRep1Id', 142);    
             client.put('Category1Id', 3);  
-			*/  
+			 */
                         
             parsedResponse.put('Client', client);
             String modifiedJson = JSON.serialize(parsedResponse);

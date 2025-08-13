@@ -55,7 +55,7 @@ public class ClientJsonBuilder {
         if (acc.mm_Trading_Name__c != null) client.put('TradingAs', acc.mm_Trading_Name__c);
         if (acc.mm_Compliance_Type__c != null) client.put('ComplianceTypeName', acc.mm_Compliance_Type__c);
         if (acc.mm_Addressee__c != null) client.put('Addressee', acc.mm_Addressee__c);
-        if (acc.mm_Referrer__c != null) client.put('Ref', acc.mm_Referrer__c.left(15)); 
+        if (acc.mm_Code__c != null) client.put('Ref', acc.mm_Code__c); 
         if (acc.mm_Company_ABN__c != null) client.put('ABN', acc.mm_Company_ABN__c);
         if (acc.FinServ__PrimaryContact__c != null) client.put('Contact', acc.FinServ__PrimaryContact__c);
         if (acc.PersonTitle != null) client.put('JobTitle', acc.PersonTitle);
@@ -85,7 +85,6 @@ public class ClientJsonBuilder {
         if (acc.mm_ABA_Reference_Number__c != null) client.put('ABARefNumber', acc.mm_ABA_Reference_Number__c);
         if (acc.mm_Email_Policy_Documents__c != null) client.put('EmailPolicyDocuments', acc.mm_Email_Policy_Documents__c);
         if (acc.mm_Email_Policy_Documents__c != null) client.put('EmailPolicyDocuments', acc.mm_Email_Policy_Documents__c);
-        // if (acc.mm_Code__c != null) client.put('ClientCode', acc.mm_Code__c);
         if (acc.Industry != null) client.put('StandardIndustryCodeName', acc.Industry);
         
         integer CountryId;

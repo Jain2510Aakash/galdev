@@ -150,7 +150,12 @@ public class InsightAPIHelperTest {
         
         
         // Insert test account
-        Account acc = new Account(Name = 'Client Get Test');
+        Account acc = new Account(Name = 'Client Get Test', BillingStreet = '123 Mock St',
+                                  BillingCity = 'Test City',
+                                  BillingState = 'Tasmania',
+                                  BillingPostalCode = '12345',
+                                  BillingCountry = 'Australia',
+                                  Phone = '555-555-5555');
         insert acc;
         
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
@@ -174,7 +179,12 @@ public class InsightAPIHelperTest {
         
         
         // Insert test account
-        Account acc = new Account(Name = 'Update Client Insight',mm_INSIGHTS_Id__c = '123');
+        Account acc = new Account(Name = 'Update Client Insight',mm_INSIGHTS_Id__c = '123', BillingStreet = '123 Mock St',
+                                  BillingCity = 'Test City',
+                                  BillingState = 'Tasmania',
+                                  BillingPostalCode = '12345',
+                                  BillingCountry = 'Australia',
+                                  Phone = '555-555-5555');
         insert acc;
         
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
@@ -214,7 +224,12 @@ public class InsightAPIHelperTest {
         );
         insert insightAPI;
         
-        Account acc = new Account(Name='Error Account');
+        Account acc = new Account(Name='Error Account', BillingStreet = '123 Mock St',
+                                  BillingCity = 'Test City',
+                                  BillingState = 'Tasmania',
+                                  BillingPostalCode = '12345',
+                                  BillingCountry = 'Australia',
+                                  Phone = '555-555-5555');
         insert acc;
         
         Test.setMock(HttpCalloutMock.class, new MalformedJsonMock());
@@ -241,7 +256,12 @@ public class InsightAPIHelperTest {
         );
         insert insightAPI;
         
-        Account acc = new Account(Name='Exception Account', mm_INSIGHTS_Id__c='123');
+        Account acc = new Account(Name='Exception Account', mm_INSIGHTS_Id__c='123', BillingStreet = '123 Mock St',
+                                  BillingCity = 'Test City',
+                                  BillingState = 'Tasmania',
+                                  BillingPostalCode = '12345',
+                                  BillingCountry = 'Australia',
+                                  Phone = '555-555-5555');
         insert acc;
         
         Test.setMock(HttpCalloutMock.class, new ThrowExceptionMock());
@@ -264,7 +284,12 @@ public class InsightAPIHelperTest {
         );
         insert insightAPI;
         
-        Account acc = new Account(Name='Error Account');
+        Account acc = new Account(Name='Error Account', BillingStreet = '123 Mock St',
+                                  BillingCity = 'Test City',
+                                  BillingState = 'Tasmania',
+                                  BillingPostalCode = '12345',
+                                  BillingCountry = 'Australia',
+                                  Phone = '555-555-5555');
         insert acc;
         
         Test.setMock(HttpCalloutMock.class, new MockHttpErrorResponse());
@@ -293,7 +318,12 @@ public class InsightAPIHelperTest {
         );
         insert insightAPI;
         
-        Account acc = new Account(Name='Malformed JSON');
+        Account acc = new Account(Name='Malformed JSON', BillingStreet = '123 Mock St',
+                                  BillingCity = 'Test City',
+                                  BillingState = 'Tasmania',
+                                  BillingPostalCode = '12345',
+                                  BillingCountry = 'Australia',
+                                  Phone = '555-555-5555');
         insert acc;
         
         Test.setMock(HttpCalloutMock.class, new BadJsonClientMock());
